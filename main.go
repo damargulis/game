@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const MAX_DEPTH = 5
+const MAX_DEPTH = 10
 
 type Player interface {
 	getTurn(Game) Move
@@ -98,10 +98,11 @@ const MinInt = -MaxInt - 1
 
 func (p MinimaxPlayer) getTurn(g Game) Move {
 	moves := g.getPossibleMoves()
+	fmt.Println(moves)
 	ch := make(chan moveVal)
 	scores := make([]int, len(moves))
 	for i, move := range moves {
-		go p.getMin(g, i, move, ch, 0)
+		go p.getScore(g, i, move, ch, 0)
 	}
 	i := 0
 	for i < len(scores) {
@@ -109,6 +110,7 @@ func (p MinimaxPlayer) getTurn(g Game) Move {
 		i++
 		scores[moveVal.move] = moveVal.val
 	}
+	fmt.Println(scores)
 	bestScore := MinInt
 	var bestMove Move
 	for i, score := range scores {
@@ -120,7 +122,7 @@ func (p MinimaxPlayer) getTurn(g Game) Move {
 	return bestMove
 }
 
-func (p MinimaxPlayer) getMax(g Game, i int, m Move, ch chan moveVal, depth int) {
+func (p MinimaxPlayer) getScore(g Game, i int, m Move, ch chan moveVal, depth int) {
 	if depth > MAX_DEPTH {
 		ch <- moveVal{move: i, val: g.currentScore(p)}
 		return
@@ -136,64 +138,57 @@ func (p MinimaxPlayer) getMax(g Game, i int, m Move, ch chan moveVal, depth int)
 			ch <- moveVal{move: i, val: MinInt}
 		}
 	} else {
-		moves := newG.getPossibleMoves()
-		newCh := make(chan moveVal)
-		scores := make([]int, len(moves))
-		for j, move := range moves {
-			go p.getMin(newG, j, move, newCh, depth+1)
+		player := g.getPlayerTurn()
+		if p == player {
+			ch <- moveVal{move: i, val: p.getMax(newG, depth+1)}
+		} else {
+			ch <- moveVal{move: i, val: p.getMin(newG, depth+1)}
 		}
-		j := 0
-		for j < len(scores) {
-			moveVal := <-newCh
-			j++
-			scores[moveVal.move] = moveVal.val
-		}
-		bestScore := MinInt
-		for _, score := range scores {
-			if score >= bestScore {
-				bestScore = score
-			}
-		}
-		ch <- moveVal{move: i, val: bestScore}
 	}
 }
 
-func (p MinimaxPlayer) getMin(g Game, i int, m Move, ch chan moveVal, depth int) {
-	if depth > MAX_DEPTH {
-		ch <- moveVal{move: i, val: g.currentScore(p)}
-		return
+func (p MinimaxPlayer) getMax(g Game, depth int) int {
+	moves := g.getPossibleMoves()
+	ch := make(chan moveVal)
+	scores := make([]int, len(moves))
+	for i, move := range moves {
+		go p.getScore(g, i, move, ch, depth)
 	}
-	newG := g.makeMove(m)
-	over, winner := newG.gameOver()
-	if over {
-		if winner == p {
-			ch <- moveVal{move: i, val: MaxInt}
-		} else if winner.getName() == "DRAW" {
-			ch <- moveVal{move: i, val: 0}
-		} else {
-			ch <- moveVal{move: i, val: MinInt}
-		}
-	} else {
-		moves := newG.getPossibleMoves()
-		newCh := make(chan moveVal)
-		scores := make([]int, len(moves))
-		for j, move := range moves {
-			go p.getMax(newG, j, move, newCh, depth+1)
-		}
-		j := 0
-		for j < len(scores) {
-			moveVal := <-newCh
-			j++
-			scores[moveVal.move] = moveVal.val
-		}
-		bestScore := MaxInt
-		for _, score := range scores {
-			if score <= bestScore {
-				bestScore = score
-			}
-		}
-		ch <- moveVal{move: i, val: bestScore}
+	i := 0
+	for i < len(scores) {
+		moveVal := <-ch
+		i++
+		scores[moveVal.move] = moveVal.val
 	}
+	bestScore := MinInt
+	for _, score := range scores {
+		if score >= bestScore {
+			bestScore = score
+		}
+	}
+	return bestScore
+}
+
+func (p MinimaxPlayer) getMin(g Game, depth int) int {
+	moves := g.getPossibleMoves()
+	ch := make(chan moveVal)
+	scores := make([]int, len(moves))
+	for i, move := range moves {
+		go p.getScore(g, i, move, ch, depth)
+	}
+	i := 0
+	for i < len(scores) {
+		moveVal := <-ch
+		i++
+		scores[moveVal.move] = moveVal.val
+	}
+	bestScore := MaxInt
+	for _, score := range scores {
+		if score <= bestScore {
+			bestScore = score
+		}
+	}
+	return bestScore
 }
 
 type Game interface {
