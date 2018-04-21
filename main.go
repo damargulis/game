@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const MAX_DEPTH = 10
+const MAX_DEPTH = 5
 
 type Player interface {
 	getTurn(Game) Move
@@ -98,7 +98,6 @@ const MinInt = -MaxInt - 1
 
 func (p MinimaxPlayer) getTurn(g Game) Move {
 	moves := g.getPossibleMoves()
-	fmt.Println(moves)
 	ch := make(chan moveVal)
 	scores := make([]int, len(moves))
 	for i, move := range moves {
@@ -110,6 +109,7 @@ func (p MinimaxPlayer) getTurn(g Game) Move {
 		i++
 		scores[moveVal.move] = moveVal.val
 	}
+	fmt.Println(moves)
 	fmt.Println(scores)
 	bestScore := MinInt
 	var bestMove Move
@@ -138,7 +138,7 @@ func (p MinimaxPlayer) getScore(g Game, i int, m Move, ch chan moveVal, depth in
 			ch <- moveVal{move: i, val: MinInt}
 		}
 	} else {
-		player := g.getPlayerTurn()
+		player := newG.getPlayerTurn()
 		if p == player {
 			ch <- moveVal{move: i, val: p.getMax(newG, depth+1)}
 		} else {
@@ -248,43 +248,50 @@ func (g TicTacToe) gameOver() (bool, Player) {
 		} else if g.board[0][0] == "O" {
 			return true, g.p2
 		}
-	} else if g.board[1][0] == g.board[1][1] && g.board[1][0] == g.board[1][2] {
+	}
+	if g.board[1][0] == g.board[1][1] && g.board[1][0] == g.board[1][2] {
 		if g.board[1][0] == "X" {
 			return true, g.p1
 		} else if g.board[1][0] == "O" {
 			return true, g.p2
 		}
-	} else if g.board[2][0] == g.board[2][1] && g.board[2][0] == g.board[2][2] {
+	}
+	if g.board[2][0] == g.board[2][1] && g.board[2][0] == g.board[2][2] {
 		if g.board[2][0] == "X" {
 			return true, g.p1
 		} else if g.board[2][0] == "O" {
 			return true, g.p2
 		}
-	} else if g.board[0][0] == g.board[1][0] && g.board[0][0] == g.board[2][0] {
+	}
+	if g.board[0][0] == g.board[1][0] && g.board[0][0] == g.board[2][0] {
 		if g.board[0][0] == "X" {
 			return true, g.p1
 		} else if g.board[0][0] == "O" {
 			return true, g.p2
 		}
-	} else if g.board[0][1] == g.board[1][1] && g.board[0][1] == g.board[2][1] {
+	}
+	if g.board[0][1] == g.board[1][1] && g.board[0][1] == g.board[2][1] {
 		if g.board[0][1] == "X" {
 			return true, g.p1
 		} else if g.board[0][1] == "O" {
 			return true, g.p2
 		}
-	} else if g.board[0][2] == g.board[1][2] && g.board[0][2] == g.board[2][2] {
+	}
+	if g.board[0][2] == g.board[1][2] && g.board[0][2] == g.board[2][2] {
 		if g.board[0][2] == "X" {
 			return true, g.p1
 		} else if g.board[0][2] == "O" {
 			return true, g.p2
 		}
-	} else if g.board[0][0] == g.board[1][1] && g.board[0][0] == g.board[2][2] {
+	}
+	if g.board[0][0] == g.board[1][1] && g.board[0][0] == g.board[2][2] {
 		if g.board[0][0] == "X" {
 			return true, g.p1
 		} else if g.board[0][0] == "O" {
 			return true, g.p2
 		}
-	} else if g.board[2][0] == g.board[1][1] && g.board[1][1] == g.board[0][2] {
+	}
+	if g.board[2][0] == g.board[1][1] && g.board[1][1] == g.board[0][2] {
 		if g.board[2][0] == "X" {
 			return true, g.p1
 		} else if g.board[2][0] == "O" {
@@ -294,7 +301,7 @@ func (g TicTacToe) gameOver() (bool, Player) {
 	for _, row := range g.board {
 		for _, p := range row {
 			if p == "." {
-				return false, HumanPlayer{"DRAW"}
+				return false, ComputerPlayer{}
 			}
 		}
 	}
@@ -473,7 +480,7 @@ func (g TicTacToe) getPossibleMoves() []Move {
 }
 
 func (g TicTacToe) currentScore(p Player) int {
-	return 1
+	return 0
 }
 
 func (g Checkers) currentScore(p Player) int {
@@ -586,7 +593,7 @@ func (g Checkers) getPossibleMoves() []Move {
 						col2: j + 1,
 					})
 				}
-				if i+2 < 8 && j-2 > 0 && (g.board[i+1][j-1] == "X" || g.board[i+1][j-1] == "x") {
+				if i+2 < 8 && j-2 > 0 && g.board[i+2][j-2] == "." && (g.board[i+1][j-1] == "X" || g.board[i+1][j-1] == "x") {
 					moves = append(moves, CheckersMove{
 						row1: i,
 						col1: j,
@@ -594,7 +601,7 @@ func (g Checkers) getPossibleMoves() []Move {
 						col2: j - 2,
 					})
 				}
-				if i+2 < 8 && j+2 < 8 && (g.board[i+1][j+1] == "X" || g.board[i+1][j+1] == "x") {
+				if i+2 < 8 && j+2 < 8 && g.board[i+2][j+2] == "." && (g.board[i+1][j+1] == "X" || g.board[i+1][j+1] == "x") {
 					moves = append(moves, CheckersMove{
 						row1: i,
 						col1: j,
@@ -619,7 +626,7 @@ func (g Checkers) getPossibleMoves() []Move {
 							col2: j + 1,
 						})
 					}
-					if i-2 > 0 && j-2 > 0 && (g.board[i-1][j-1] == "x" || g.board[i-1][j-1] == "X") {
+					if i-2 > 0 && j-2 > 0 && g.board[i-2][j-2] == "." && (g.board[i-1][j-1] == "x" || g.board[i-1][j-1] == "X") {
 						moves = append(moves, CheckersMove{
 							row1: i,
 							col1: j,
@@ -627,7 +634,7 @@ func (g Checkers) getPossibleMoves() []Move {
 							col2: j - 2,
 						})
 					}
-					if i-2 > 0 && j+2 < 8 && (g.board[i-1][j+1] == "x" || g.board[i-1][j+1] == "X") {
+					if i-2 > 0 && j+2 < 8 && g.board[i-2][j+2] == "." && (g.board[i-1][j+1] == "x" || g.board[i-1][j+1] == "X") {
 						moves = append(moves, CheckersMove{
 							row1: i,
 							col1: j,
