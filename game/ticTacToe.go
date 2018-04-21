@@ -1,0 +1,182 @@
+package game
+
+import (
+	"bufio"
+	"fmt"
+	"github.com/damargulis/game/interfaces"
+	"github.com/damargulis/game/player"
+	"os"
+	"strconv"
+	"strings"
+)
+
+type TicTacToe struct {
+	board [3][3]string
+	p1    game.Player
+	p2    game.Player
+	pTurn bool
+}
+
+type TicTacToeMove struct {
+	row, col int
+}
+
+func (g TicTacToe) GetHumanInput() game.Move {
+	reader := bufio.NewReader(os.Stdin)
+	text, _ := reader.ReadString('\n')
+	move := strings.Split(strings.TrimSpace(text), ",")
+	row, col := move[0], move[1]
+	rowI, _ := strconv.Atoi(row)
+	colI, _ := strconv.Atoi(col)
+	return TicTacToeMove{row: rowI, col: colI}
+}
+
+func (g TicTacToe) GameOver() (bool, game.Player) {
+	if g.board[0][0] == g.board[0][1] && g.board[0][0] == g.board[0][2] {
+		if g.board[0][0] == "X" {
+			return true, g.p1
+		} else if g.board[0][0] == "O" {
+			return true, g.p2
+		}
+	}
+	if g.board[1][0] == g.board[1][1] && g.board[1][0] == g.board[1][2] {
+		if g.board[1][0] == "X" {
+			return true, g.p1
+		} else if g.board[1][0] == "O" {
+			return true, g.p2
+		}
+	}
+	if g.board[2][0] == g.board[2][1] && g.board[2][0] == g.board[2][2] {
+		if g.board[2][0] == "X" {
+			return true, g.p1
+		} else if g.board[2][0] == "O" {
+			return true, g.p2
+		}
+	}
+	if g.board[0][0] == g.board[1][0] && g.board[0][0] == g.board[2][0] {
+		if g.board[0][0] == "X" {
+			return true, g.p1
+		} else if g.board[0][0] == "O" {
+			return true, g.p2
+		}
+	}
+	if g.board[0][1] == g.board[1][1] && g.board[0][1] == g.board[2][1] {
+		if g.board[0][1] == "X" {
+			return true, g.p1
+		} else if g.board[0][1] == "O" {
+			return true, g.p2
+		}
+	}
+	if g.board[0][2] == g.board[1][2] && g.board[0][2] == g.board[2][2] {
+		if g.board[0][2] == "X" {
+			return true, g.p1
+		} else if g.board[0][2] == "O" {
+			return true, g.p2
+		}
+	}
+	if g.board[0][0] == g.board[1][1] && g.board[0][0] == g.board[2][2] {
+		if g.board[0][0] == "X" {
+			return true, g.p1
+		} else if g.board[0][0] == "O" {
+			return true, g.p2
+		}
+	}
+	if g.board[2][0] == g.board[1][1] && g.board[1][1] == g.board[0][2] {
+		if g.board[2][0] == "X" {
+			return true, g.p1
+		} else if g.board[2][0] == "O" {
+			return true, g.p2
+		}
+	}
+	for _, row := range g.board {
+		for _, p := range row {
+			if p == "." {
+				return false, player.ComputerPlayer{}
+			}
+		}
+	}
+	return true, player.HumanPlayer{"DRAW"}
+}
+
+func NewTicTacToe(p1, p2 string) *TicTacToe {
+	g := new(TicTacToe)
+	g.p1 = getPlayer(p1, "Player 1")
+	g.p2 = getPlayer(p2, "Player 2")
+	g.pTurn = true
+	g.board = [3][3]string{
+		{".", ".", "."},
+		{".", ".", "."},
+		{".", ".", "."},
+	}
+	return g
+}
+
+func (g TicTacToe) MakeMove(m game.Move) game.Game {
+	move := m.(TicTacToeMove)
+	row := move.row
+	col := move.col
+	if g.pTurn {
+		g.board[row][col] = "X"
+	} else {
+		g.board[row][col] = "O"
+	}
+	g.pTurn = !g.pTurn
+	return g
+}
+
+func (g TicTacToe) isGoodMove(m TicTacToeMove) bool {
+	row := m.row
+	col := m.col
+	if row < 0 || col < 0 {
+		return false
+	} else if row > 2 || col > 2 {
+		return false
+	} else {
+		return g.board[row][col] == "."
+	}
+}
+
+func (g TicTacToe) GetPossibleMoves() []game.Move {
+	var moves []game.Move
+	for i, row := range g.board {
+		for j, spot := range row {
+			if spot == "." {
+				moves = append(moves, TicTacToeMove{row: i, col: j})
+			}
+		}
+	}
+	return moves
+}
+
+func (g TicTacToe) CurrentScore(p game.Player) int {
+	return 0
+}
+
+func (g TicTacToe) GetPlayerTurn() game.Player {
+	if g.pTurn {
+		return g.p1
+	} else {
+		return g.p2
+	}
+}
+
+func (g TicTacToe) GetTurn(p game.Player) game.Move {
+	m := p.GetTurn(g)
+	move := m.(TicTacToeMove)
+	for !g.isGoodMove(move) {
+		m = p.GetTurn(g)
+		move = m.(TicTacToeMove)
+	}
+	return m
+}
+
+func (g TicTacToe) PrintBoard() {
+	fmt.Println("---")
+	for _, row := range g.board {
+		for _, p := range row {
+			fmt.Print(p)
+		}
+		fmt.Println()
+	}
+	fmt.Println("---")
+}
