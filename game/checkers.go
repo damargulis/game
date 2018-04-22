@@ -16,6 +16,7 @@ type Checkers struct {
 	p2                 game.Player
 	pTurn, didJustJump bool
 	jumpRow, jumpCol   int
+	round              int
 }
 
 type CheckersMove struct {
@@ -57,17 +58,17 @@ func (g Checkers) GameOver() (bool, game.Player) {
 		return true, g.p1
 	} else {
 		moves := g.GetPossibleMoves()
-		if len(moves) == 0 {
+		if len(moves) == 0 || g.round > 10000 {
 			return true, player.HumanPlayer{"DRAW"}
 		}
 		return false, player.ComputerPlayer{}
 	}
 }
 
-func NewCheckers(p1, p2 string) *Checkers {
+func NewCheckers(p1 string, p2 string, depth1 int, depth2 int) *Checkers {
 	c := new(Checkers)
-	c.p1 = getPlayer(p1, "Player 1")
-	c.p2 = getPlayer(p2, "Player 2")
+	c.p1 = getPlayer(p1, "Player 1", depth1)
+	c.p2 = getPlayer(p2, "Player 2", depth2)
 	c.pTurn = true
 	c.board = [8][8]string{
 		{".", "o", ".", "o", ".", "o", ".", "o"},
@@ -80,10 +81,12 @@ func NewCheckers(p1, p2 string) *Checkers {
 		{"x", ".", "x", ".", "x", ".", "x", "."},
 	}
 	c.didJustJump = false
+	c.round = 0
 	return c
 }
 
 func (g Checkers) MakeMove(m game.Move) game.Game {
+	g.round++
 	move := m.(CheckersMove)
 	g.board[move.row2][move.col2] = g.board[move.row1][move.col1]
 	g.board[move.row1][move.col1] = "."

@@ -98,10 +98,10 @@ func (g TicTacToe) GameOver() (bool, game.Player) {
 	return true, player.HumanPlayer{"DRAW"}
 }
 
-func NewTicTacToe(p1, p2 string) *TicTacToe {
+func NewTicTacToe(p1 string, p2 string, depth1 int, depth2 int) *TicTacToe {
 	g := new(TicTacToe)
-	g.p1 = getPlayer(p1, "Player 1")
-	g.p2 = getPlayer(p2, "Player 2")
+	g.p1 = getPlayer(p1, "Player 1", depth1)
+	g.p2 = getPlayer(p2, "Player 2", depth2)
 	g.pTurn = true
 	g.board = [3][3]string{
 		{".", ".", "."},

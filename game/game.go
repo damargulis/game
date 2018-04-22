@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func getPlayer(playerType string, name string) game.Player {
+func getPlayer(playerType string, name string, depth int) game.Player {
 	var p game.Player
 	switch playerType {
 	case "Human":
@@ -15,7 +15,7 @@ func getPlayer(playerType string, name string) game.Player {
 	case "Computer":
 		p = player.ComputerPlayer{name}
 	case "Minimax":
-		p = player.MinimaxPlayer{name}
+		p = player.MinimaxPlayer{name, depth}
 	default:
 		fmt.Println("Player " + playerType + " not recognized")
 		os.Exit(1)
@@ -23,7 +23,7 @@ func getPlayer(playerType string, name string) game.Player {
 	return p
 }
 
-func Play(g game.Game) {
+func Play(g game.Game) int {
 	var winner game.Player
 	over := false
 	for ; !over; over, winner = g.GameOver() {
@@ -35,7 +35,13 @@ func Play(g game.Game) {
 	name := winner.GetName()
 	if name == "DRAW" {
 		fmt.Println("Its a draw!")
+		return 0
 	} else {
 		fmt.Println(name + " Wins!")
+		if name == "Player 1" {
+			return 1
+		} else {
+			return 2
+		}
 	}
 }

@@ -343,10 +343,10 @@ func (g Reversi) CurrentScore(p game.Player) int {
 	}
 }
 
-func NewReversi(p1, p2 string) *Reversi {
+func NewReversi(p1 string, p2 string, depth1 int, depth2 int) *Reversi {
 	r := new(Reversi)
-	r.p1 = getPlayer(p1, "Player 1")
-	r.p2 = getPlayer(p2, "Player 2")
+	r.p1 = getPlayer(p1, "Player 1", depth1)
+	r.p2 = getPlayer(p2, "Player 2", depth2)
 	r.pTurn = true
 	r.board = [8][8]string{
 		{".", ".", ".", ".", ".", ".", ".", "."},
