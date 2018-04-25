@@ -9,6 +9,7 @@ type Move interface {
 }
 
 type Game interface {
+	BoardString() string
 	PrintBoard()
 	GetPlayerTurn() Player
 	GetHumanInput() Move

@@ -21,6 +21,22 @@ type ReversiMove struct {
 	row, col int
 }
 
+func (g Reversi) BoardString() string {
+	s := "-----------------\n"
+	s += "  0 1 2 3 4 5 6 7\n"
+	for i, row := range g.board {
+		s += fmt.Sprintf("%v ", i)
+		for _, p := range row {
+			s += p
+			s += " "
+		}
+		s += "\n"
+	}
+	s += "  0 1 2 3 4 5 6 7\n"
+	s += "-----------------\n"
+	return s
+}
+
 func (g Reversi) PrintBoard() {
 	fmt.Println("-----------------")
 	fmt.Println("  0 1 2 3 4 5 6 7")

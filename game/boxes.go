@@ -24,6 +24,44 @@ type BoxesMove struct {
 	row, col   int
 }
 
+func (g Boxes) BoardString() string {
+	s := "***********\n"
+	s += "  012345678\n"
+	rowNum := 0
+	for i, row := range g.horizontal {
+		s += fmt.Sprintf("%v ", rowNum)
+		rowNum++
+		for _, spot := range row {
+			s += "."
+			if spot {
+				s += "-"
+			} else {
+				s += " "
+			}
+		}
+		s += ".\n"
+		if i >= len(g.vertical) {
+			continue
+		}
+		s += fmt.Sprintf("%v ", rowNum)
+		rowNum++
+		for j, spot := range g.vertical[i] {
+			if spot {
+				s += "|"
+			} else {
+				s += " "
+			}
+			if i < len(g.owners) && j < len(g.owners[i]) {
+				s += g.owners[i][j]
+			}
+		}
+		s += "\n"
+	}
+	s += "  012345678\n"
+	s += "***********\n"
+	return s
+}
+
 func (g Boxes) PrintBoard() {
 	fmt.Println("***********")
 	fmt.Println("  012345678")

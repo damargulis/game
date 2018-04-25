@@ -21,6 +21,21 @@ type Connect4Move struct {
 	col int
 }
 
+func (g Connect4) BoardString() string {
+	s := "-----------------\n"
+	for i, row := range g.board {
+		s += fmt.Sprintf("%v ", i)
+		for _, p := range row {
+			s += p
+			s += " "
+		}
+		s += "\n"
+	}
+	s += "  0 1 2 3 4 5 6 7\n"
+	s += "-----------------\n"
+	return s
+}
+
 func (g Connect4) PrintBoard() {
 	fmt.Println("-----------------")
 	for i, row := range g.board {

@@ -19,11 +19,6 @@ type moveVal struct {
 	val  int
 }
 
-const MaxUint = ^uint(0)
-const MinUint = 0
-const MaxInt = int(MaxUint >> 1)
-const MinInt = -MaxInt - 1
-
 func (p MinimaxPlayer) GetTurn(g game.Game) game.Move {
 	moves := g.GetPossibleMoves()
 	ch := make(chan moveVal)

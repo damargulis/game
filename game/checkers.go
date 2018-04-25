@@ -58,7 +58,7 @@ func (g Checkers) GameOver() (bool, game.Player) {
 		return true, g.p1
 	} else {
 		moves := g.GetPossibleMoves()
-		if len(moves) == 0 || g.round > 10000 {
+		if len(moves) == 0 || g.round > 5000 {
 			return true, player.HumanPlayer{"DRAW"}
 		}
 		return false, player.ComputerPlayer{}
@@ -129,68 +129,13 @@ func (g Checkers) MakeMove(m game.Move) game.Game {
 }
 
 func (g Checkers) isGoodMove(m CheckersMove) bool {
-	row1, row2, col1, col2 := m.row1, m.row2, m.col1, m.col2
-	if row1 < 0 || row2 < 0 || col1 < 0 || col2 < 0 {
-		return false
-	} else if row1 >= 8 || row2 >= 8 || col1 >= 8 || col2 >= 8 {
-		return false
-	} else if g.board[row2][col2] != "." {
-		return false
-	} else if g.pTurn && g.board[row1][col1] == "x" {
-		if row1 == row2+1 && (col1 == col2+1 || col1 == col2-1) {
+	possibleMoves := g.GetPossibleMoves()
+	for _, move := range possibleMoves {
+		if move == m {
 			return true
-		} else if row1 == row2+2 && col1 == col2+2 && (g.board[row2+1][col2+1] == "O" || g.board[row2+1][col2+1] == "o") {
-			return true
-		} else if row1 == row2+2 && col1 == col2-2 && (g.board[row2+1][col2-1] == "O" || g.board[row2+1][col2-1] == "o") {
-			return true
-		} else {
-			return false
 		}
-	} else if g.pTurn && g.board[row1][col1] == "X" {
-		if row1 == row2+1 && (col1 == col2+1 || col1 == col2-1) {
-			return true
-		} else if row1 == row2+2 && col1 == col2+2 && (g.board[row2+1][col2+1] == "O" || g.board[row2+1][col2+1] == "o") {
-			return true
-		} else if row1 == row2+2 && col1 == col2-2 && (g.board[row2+1][col2-1] == "O" || g.board[row2+1][col2-1] == "o") {
-			return true
-		} else if row1 == row2-1 && (col1 == col2+1 || col1 == col2-1) {
-			return true
-		} else if row1 == row2-2 && col1 == col2+2 && (g.board[row2-1][col2+1] == "O" || g.board[row2-1][col2+1] == "o") {
-			return true
-		} else if row1 == row2-2 && col1 == col2-2 && (g.board[row2-1][col2-1] == "O" || g.board[row2-1][col2-1] == "o") {
-			return true
-		} else {
-			return false
-		}
-	} else if !g.pTurn && g.board[row1][col1] == "o" {
-		if row1 == row2-1 && (col1 == col2+1 || col1 == col2-1) {
-			return true
-		} else if row1 == row2-2 && col1 == col2+2 && (g.board[row2-1][col2+1] == "X" || g.board[row2-1][col2+1] == "x") {
-			return true
-		} else if row1 == row2-2 && col1 == col2-2 && (g.board[row2-1][col2-1] == "X" || g.board[row2-1][col2-1] == "x") {
-			return true
-		} else {
-			return false
-		}
-	} else if !g.pTurn && g.board[row1][col1] == "O" {
-		if row1 == row2+1 && (col1 == col2+1 || col1 == col2-1) {
-			return true
-		} else if row1 == row2+2 && col1 == col2+2 && (g.board[row2+1][col2+1] == "X" || g.board[row2+1][col2+1] == "x") {
-			return true
-		} else if row1 == row2+2 && col1 == col2-2 && (g.board[row2+1][col2-1] == "X" || g.board[row2+1][col2-1] == "x") {
-			return true
-		} else if row1 == row2-1 && (col1 == col2+1 || col1 == col2-1) {
-			return true
-		} else if row1 == row2-2 && col1 == col2+2 && (g.board[row2-1][col2+1] == "X" || g.board[row2-1][col2+1] == "x") {
-			return true
-		} else if row1 == row2-2 && col1 == col2-2 && (g.board[row2-1][col2-1] == "X" || g.board[row2-1][col2-1] == "x") {
-			return true
-		} else {
-			return false
-		}
-	} else {
-		return false
 	}
+	return false
 }
 
 func (g Checkers) CurrentScore(p game.Player) int {
@@ -299,22 +244,6 @@ func (g Checkers) GetPossibleMoves() []game.Move {
 	for i, row := range g.board {
 		for j, spot := range row {
 			if g.pTurn && (spot == "X" || spot == "x") {
-				if i-1 >= 0 && j-1 >= 0 && g.board[i-1][j-1] == "." {
-					moves = append(moves, CheckersMove{
-						row1: i,
-						col1: j,
-						row2: i - 1,
-						col2: j - 1,
-					})
-				}
-				if i-1 >= 0 && j+1 < 8 && g.board[i-1][j+1] == "." {
-					moves = append(moves, CheckersMove{
-						row1: i,
-						col1: j,
-						row2: i - 1,
-						col2: j + 1,
-					})
-				}
 				if i-2 >= 0 && j-2 >= 0 && g.board[i-2][j-2] == "." && (g.board[i-1][j-1] == "O" || g.board[i-1][j-1] == "o") {
 					moves = append(moves, CheckersMove{
 						row1: i,
@@ -332,22 +261,6 @@ func (g Checkers) GetPossibleMoves() []game.Move {
 					})
 				}
 				if spot == "X" {
-					if i+1 < 8 && j-1 >= 0 && g.board[i+1][j-1] == "." {
-						moves = append(moves, CheckersMove{
-							row1: i,
-							col1: j,
-							row2: i + 1,
-							col2: j - 1,
-						})
-					}
-					if i+1 < 8 && j+1 < 8 && g.board[i+1][j+1] == "." {
-						moves = append(moves, CheckersMove{
-							row1: i,
-							col1: j,
-							row2: i + 1,
-							col2: j + 1,
-						})
-					}
 					if i+2 < 8 && j-2 >= 0 && g.board[i+2][j-2] == "." && (g.board[i+1][j-1] == "O" || g.board[i+1][j-1] == "o") {
 						moves = append(moves, CheckersMove{
 							row1: i,
@@ -366,22 +279,6 @@ func (g Checkers) GetPossibleMoves() []game.Move {
 					}
 				}
 			} else if !g.pTurn && (spot == "O" || spot == "o") {
-				if i+1 < 8 && j-1 >= 0 && g.board[i+1][j-1] == "." {
-					moves = append(moves, CheckersMove{
-						row1: i,
-						col1: j,
-						row2: i + 1,
-						col2: j - 1,
-					})
-				}
-				if i+1 < 8 && j+1 < 8 && g.board[i+1][j+1] == "." {
-					moves = append(moves, CheckersMove{
-						row1: i,
-						col1: j,
-						row2: i + 1,
-						col2: j + 1,
-					})
-				}
 				if i+2 < 8 && j-2 >= 0 && g.board[i+2][j-2] == "." && (g.board[i+1][j-1] == "X" || g.board[i+1][j-1] == "x") {
 					moves = append(moves, CheckersMove{
 						row1: i,
@@ -399,22 +296,6 @@ func (g Checkers) GetPossibleMoves() []game.Move {
 					})
 				}
 				if spot == "O" {
-					if i-1 >= 0 && j-1 >= 0 && g.board[i-1][j-1] == "." {
-						moves = append(moves, CheckersMove{
-							row1: i,
-							col1: j,
-							row2: i - 1,
-							col2: j - 1,
-						})
-					}
-					if i-1 >= 0 && j+1 < 8 && g.board[i-1][j+1] == "." {
-						moves = append(moves, CheckersMove{
-							row1: i,
-							col1: j,
-							row2: i - 1,
-							col2: j + 1,
-						})
-					}
 					if i-2 >= 0 && j-2 >= 0 && g.board[i-2][j-2] == "." && (g.board[i-1][j-1] == "x" || g.board[i-1][j-1] == "X") {
 						moves = append(moves, CheckersMove{
 							row1: i,
@@ -435,6 +316,84 @@ func (g Checkers) GetPossibleMoves() []game.Move {
 			}
 		}
 	}
+	if len(moves) > 0 {
+		return moves
+	}
+	for i, row := range g.board {
+		for j, spot := range row {
+			if g.pTurn && (spot == "X" || spot == "x") {
+				if i-1 >= 0 && j-1 >= 0 && g.board[i-1][j-1] == "." {
+					moves = append(moves, CheckersMove{
+						row1: i,
+						col1: j,
+						row2: i - 1,
+						col2: j - 1,
+					})
+				}
+				if i-1 >= 0 && j+1 < 8 && g.board[i-1][j+1] == "." {
+					moves = append(moves, CheckersMove{
+						row1: i,
+						col1: j,
+						row2: i - 1,
+						col2: j + 1,
+					})
+				}
+				if spot == "X" {
+					if i+1 < 8 && j-1 >= 0 && g.board[i+1][j-1] == "." {
+						moves = append(moves, CheckersMove{
+							row1: i,
+							col1: j,
+							row2: i + 1,
+							col2: j - 1,
+						})
+					}
+					if i+1 < 8 && j+1 < 8 && g.board[i+1][j+1] == "." {
+						moves = append(moves, CheckersMove{
+							row1: i,
+							col1: j,
+							row2: i + 1,
+							col2: j + 1,
+						})
+					}
+				}
+			} else if !g.pTurn && (spot == "O" || spot == "o") {
+				if i+1 < 8 && j-1 >= 0 && g.board[i+1][j-1] == "." {
+					moves = append(moves, CheckersMove{
+						row1: i,
+						col1: j,
+						row2: i + 1,
+						col2: j - 1,
+					})
+				}
+				if i+1 < 8 && j+1 < 8 && g.board[i+1][j+1] == "." {
+					moves = append(moves, CheckersMove{
+						row1: i,
+						col1: j,
+						row2: i + 1,
+						col2: j + 1,
+					})
+				}
+				if spot == "O" {
+					if i-1 >= 0 && j-1 >= 0 && g.board[i-1][j-1] == "." {
+						moves = append(moves, CheckersMove{
+							row1: i,
+							col1: j,
+							row2: i - 1,
+							col2: j - 1,
+						})
+					}
+					if i-1 >= 0 && j+1 < 8 && g.board[i-1][j+1] == "." {
+						moves = append(moves, CheckersMove{
+							row1: i,
+							col1: j,
+							row2: i - 1,
+							col2: j + 1,
+						})
+					}
+				}
+			}
+		}
+	}
 	return moves
 }
 
@@ -448,12 +407,28 @@ func (g Checkers) GetPlayerTurn() game.Player {
 
 func (g Checkers) GetTurn(p game.Player) game.Move {
 	m := p.GetTurn(g)
-	move := m.(CheckersMove)
-	for !g.isGoodMove(move) {
-		m = p.GetTurn(g)
-		move = m.(CheckersMove)
-	}
+	//move := m.(CheckersMove)
+	//for !g.isGoodMove(move) {
+	//	m = p.GetTurn(g)
+	//	move = m.(CheckersMove)
+	//}
 	return m
+}
+
+func (g Checkers) BoardString() string {
+	s := "-----------------\n"
+	s += "  0 1 2 3 4 5 6 7\n"
+	for i, row := range g.board {
+		s += fmt.Sprintf("%v ", i)
+		for _, p := range row {
+			s += p
+			s += " "
+		}
+		s += "\n"
+	}
+	s += "  0 1 2 3 4 5 6 7\n"
+	s += "-----------------\n"
+	return s
 }
 
 func (g Checkers) PrintBoard() {

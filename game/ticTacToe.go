@@ -170,6 +170,18 @@ func (g TicTacToe) GetTurn(p game.Player) game.Move {
 	return m
 }
 
+func (g TicTacToe) BoardString() string {
+	s := "---\n"
+	for _, row := range g.board {
+		for _, p := range row {
+			s += p
+		}
+		s += "\n"
+	}
+	s += "---\n"
+	return s
+}
+
 func (g TicTacToe) PrintBoard() {
 	fmt.Println("---")
 	for _, row := range g.board {
