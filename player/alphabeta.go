@@ -20,8 +20,13 @@ func (p AlphabetaPlayer) GetTurn(g game.Game) game.Move {
 	v := MinInt
 	alpha := MinInt
 	beta := MaxInt
+
+	if len(moves) > p.MaxDepth {
+		return moves[rand.Intn(len(moves))]
+	}
+
 	for i, move := range moves {
-		score := p.getScore(g, move, 0, alpha, beta)
+		score := p.getScore(g, move, len(moves)+1, alpha, beta)
 		scores[i] = score
 		if score > v {
 			v = score

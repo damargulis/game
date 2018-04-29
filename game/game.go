@@ -37,21 +37,29 @@ func printBoard(g game.Game, outputFile string) {
 	}
 }
 
-func Play(g game.Game, gameFile string) int {
+func Play(g game.Game, print bool) int {
 	var winner game.Player
 	over := false
 	for ; !over; over, winner = g.GameOver() {
-		printBoard(g, gameFile)
+		if print {
+			fmt.Println(g.BoardString())
+		}
 		move := g.GetTurn(g.GetPlayerTurn())
 		g = g.MakeMove(move)
 	}
-	printBoard(g, gameFile)
+	if print {
+		fmt.Println(g.BoardString())
+	}
 	name := winner.GetName()
 	if name == "DRAW" {
-		fmt.Println("Its a draw!")
+		if print {
+			fmt.Println("Its a draw!")
+		}
 		return 0
 	} else {
-		fmt.Println(name + " Wins!")
+		if print {
+			fmt.Println(name + " Wins!")
+		}
 		if name == "Player 1" {
 			return 1
 		} else {
