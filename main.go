@@ -23,7 +23,7 @@ func writeOutput(fileName string, p1depth, p2depth, p1wins, p2wins, ties int, ti
 
 func runExperiment(wrapper func(string, string, int, int) int, p1 string, p2 string, outputFile string, ch chan int, title string, graphFile string) {
 	for curMax := 0; curMax < 50; curMax++ {
-		for curMin := 0; curMin <= curMax; curMin++ {
+		for curMin := 0; curMin < curMax; curMin++ {
 			wins := [3]int{0, 0, 0}
 			start := time.Now()
 			for i := 0; i < 200; i++ {
@@ -46,14 +46,25 @@ func runExperiment(wrapper func(string, string, int, int) int, p1 string, p2 str
 			writeOutput(outputFile, curMin, curMax, wins[1], wins[2], wins[0], elapsed)
 			graph.CreateGraph(title, outputFile, graphFile)
 		}
+		wins := [3]int{0, 0, 0}
+		start := time.Now()
+		for i := 0; i < 200; i++ {
+			win := wrapper(p1, p2, curMax, curMax)
+			wins[win]++
+		}
+		t := time.Now()
+		elapsed := t.Sub(start)
+		writeOutput(outputFile, curMax, curMax, wins[1], wins[2], wins[0], elapsed)
+		graph.CreateGraph(title, outputFile, graphFile)
+
 	}
 	ch <- 0
 }
 
 func main() {
 	rand.Seed(time.Now().Unix())
-	p1 := flag.String("p1", "Human", "Player 1")
-	p2 := flag.String("p2", "Computer", "Player 2")
+	p1 := flag.String("p1", "Alphabeta", "Player 1")
+	p2 := flag.String("p2", "Alphabeta", "Player 2")
 	flag.Parse()
 	ch := make(chan int)
 
