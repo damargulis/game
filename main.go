@@ -22,41 +22,35 @@ func writeOutput(fileName string, p1depth, p2depth, p1wins, p2wins, ties int, ti
 }
 
 func runExperiment(wrapper func(string, string, int, int) int, p1 string, p2 string, outputFile string, ch chan int, title string, graphFile string) {
-	for curMax := 0; curMax < 100; curMax++ {
-		for curMin := 0; curMin < curMax; curMin++ {
-			wins := [3]int{0, 0, 0}
-			start := time.Now()
-			for i := 0; i < 1000; i++ {
+	for i := 0; i < 1000; i++ {
+		for curMax := 0; curMax < 100; curMax++ {
+			for curMin := 0; curMin < curMax; curMin++ {
+				wins := [3]int{0, 0, 0}
+				start := time.Now()
 				win := wrapper(p1, p2, curMax, curMin)
 				wins[win]++
-			}
-			t := time.Now()
-			elapsed := t.Sub(start)
-			writeOutput(outputFile, curMax, curMin, wins[1], wins[2], wins[0], elapsed)
-			graph.CreateGraph(title, outputFile, graphFile)
+				t := time.Now()
+				elapsed := t.Sub(start)
+				writeOutput(outputFile, curMax, curMin, wins[1], wins[2], wins[0], elapsed)
 
-			wins = [3]int{0, 0, 0}
-			start = time.Now()
-			for i:= 0; i<1000; i++ {
-				win := wrapper(p1, p2, curMin, curMax)
+				wins = [3]int{0, 0, 0}
+				start = time.Now()
+				win = wrapper(p1, p2, curMin, curMax)
 				wins[win]++
+				t = time.Now()
+				elapsed = t.Sub(start)
+				writeOutput(outputFile, curMin, curMax, wins[1], wins[2], wins[0], elapsed)
 			}
-			t = time.Now()
-			elapsed = t.Sub(start)
-			writeOutput(outputFile, curMin, curMax, wins[1], wins[2], wins[0], elapsed)
-			graph.CreateGraph(title, outputFile, graphFile)
-		}
-		wins := [3]int{0, 0, 0}
-		start := time.Now()
-		for i:= 0; i<1000; i++ {
+			wins := [3]int{0, 0, 0}
+			start := time.Now()
 			win := wrapper(p1, p2, curMax, curMax)
 			wins[win]++
-		}
-		t := time.Now()
-		elapsed := t.Sub(start)
-		writeOutput(outputFile, curMax, curMax, wins[1], wins[2], wins[0], elapsed)
-		graph.CreateGraph(title, outputFile, graphFile)
+			t := time.Now()
+			elapsed := t.Sub(start)
+			writeOutput(outputFile, curMax, curMax, wins[1], wins[2], wins[0], elapsed)
+			graph.CreateGraph(title, outputFile, graphFile)
 
+		}
 	}
 	ch <- 0
 }
