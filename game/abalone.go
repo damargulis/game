@@ -431,7 +431,7 @@ func (g Abalone) MakeMove(m game.Move) game.Game {
 }
 
 func (g Abalone) GameOver() (bool, game.Player) {
-	if g.round > 100 {
+	if g.round > 500 {
 		return true, player.HumanPlayer{"DRAW"}
 	}
 	if len(g.GetPossibleMoves()) == 0 {

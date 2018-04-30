@@ -49,7 +49,7 @@ func runExperiment(wrapper func(string, string, int, int) int, p1 string, p2 str
 			elapsed := t.Sub(start)
 			writeOutput(outputFile, curMax, curMax, wins[1], wins[2], wins[0], elapsed)
 			graph.CreateGraph(title, outputFile, graphFile)
-
+			fmt.Printf("%v finished depth %v on iteration %v\n", title, curMax, i)
 		}
 	}
 	ch <- 0

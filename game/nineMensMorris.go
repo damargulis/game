@@ -320,7 +320,7 @@ func (g NineMensMorris) isInMill(row, col int) bool {
 }
 
 func (g NineMensMorris) GameOver() (bool, game.Player) {
-	if g.round > 1000 {
+	if g.round > 500 {
 		return true, player.HumanPlayer{"DRAW"}
 	}
 	if g.stage1 {
