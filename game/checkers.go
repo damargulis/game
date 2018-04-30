@@ -58,7 +58,7 @@ func (g Checkers) GameOver() (bool, game.Player) {
 		return true, g.p1
 	} else {
 		moves := g.GetPossibleMoves()
-		if len(moves) == 0 || g.round > 5000 {
+		if len(moves) == 0 || g.round > 500 {
 			return true, player.HumanPlayer{"DRAW"}
 		}
 		return false, player.ComputerPlayer{}

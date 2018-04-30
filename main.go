@@ -22,11 +22,11 @@ func writeOutput(fileName string, p1depth, p2depth, p1wins, p2wins, ties int, ti
 }
 
 func runExperiment(wrapper func(string, string, int, int) int, p1 string, p2 string, outputFile string, ch chan int, title string, graphFile string) {
-	for curMax := 0; curMax < 50; curMax++ {
+	for curMax := 0; curMax < 100; curMax++ {
 		for curMin := 0; curMin < curMax; curMin++ {
 			wins := [3]int{0, 0, 0}
 			start := time.Now()
-			for i := 0; i < 200; i++ {
+			for i := 0; i < 1000; i++ {
 				win := wrapper(p1, p2, curMax, curMin)
 				wins[win]++
 			}
@@ -37,7 +37,7 @@ func runExperiment(wrapper func(string, string, int, int) int, p1 string, p2 str
 
 			wins = [3]int{0, 0, 0}
 			start = time.Now()
-			for i := 0; i < 200; i++ {
+			for i:= 0; i<1000; i++ {
 				win := wrapper(p1, p2, curMin, curMax)
 				wins[win]++
 			}
@@ -48,7 +48,7 @@ func runExperiment(wrapper func(string, string, int, int) int, p1 string, p2 str
 		}
 		wins := [3]int{0, 0, 0}
 		start := time.Now()
-		for i := 0; i < 200; i++ {
+		for i:= 0; i<1000; i++ {
 			win := wrapper(p1, p2, curMax, curMax)
 			wins[win]++
 		}
@@ -68,7 +68,7 @@ func main() {
 	flag.Parse()
 	ch := make(chan int)
 
-	abaloneWrap := func(p1 string, p2 string, depth1 int, depth2 int) int {
+	abaloneWrap := func(p1 string, p2 string, depth1, depth2 int) int {
 		g := game.NewAbalone(p1, p2, depth1, depth2)
 		return game.Play(g, false)
 	}
@@ -104,7 +104,7 @@ func main() {
 	go runExperiment(boxesWrap, *p1, *p2, "boxes.csv", ch, "Boxes", "boxes.png")
 	go runExperiment(checkersWrap, *p1, *p2, "checkers.csv", ch, "Checkers", "checkers.png")
 	go runExperiment(connect4Wrap, *p1, *p2, "connect4.csv", ch, "Connect 4", "connect4.png")
-	go runExperiment(mancalaWrap, *p1, *p2, "mancala.csv", ch, "Mancala", "mancalaa.png")
+	go runExperiment(mancalaWrap, *p1, *p2, "mancala.csv", ch, "Mancala", "mancala.png")
 	go runExperiment(nineMensMorrisWrap, *p1, *p2, "ninemensmorris.csv", ch, "Nine Men's Morris", "ninemensmorris.png")
 	go runExperiment(reversiWrap, *p1, *p2, "reversi.csv", ch, "Reversi", "reversi.png")
 	go runExperiment(tictactoeWrap, *p1, *p2, "tictactoe.csv", ch, "Tic Tac Toe", "tictactoe.png")
