@@ -63,8 +63,8 @@ func main() {
 	ch := make(chan int)
 
 	pentagoWrap := func(p1 string, p2 string, p1depth int, p2depth int) int {
-		g := game.NewPentago(*p1, *p2, p1depth, p2depth)
-		return = game.Play(g, false)
+		g := game.NewPentago(p1, p2, p1depth, p2depth)
+		return game.Play(g, false)
 	}
 	go runExperiment(pentagoWrap, *p1, *p2, "pentago.csv", ch, "Pentago", "pentago.png")
 	<-ch
