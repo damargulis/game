@@ -192,6 +192,8 @@ func (g Pentago) MakeMove(m game.Move) game.Game {
 
 func (g Pentago) GameOver() (bool, game.Player) {
 	hasSpace := false
+	p1win := false
+	p2win := false
 	for i, row := range g.board {
 		for j, spot := range row {
 			if spot == "." {
@@ -201,42 +203,48 @@ func (g Pentago) GameOver() (bool, game.Player) {
 			if i+4 < 6 {
 				if spot == g.board[i+1][j] && spot == g.board[i+2][j] && spot == g.board[i+3][j] && spot == g.board[i+4][j] {
 					if spot == "X" {
-						return true, g.p1
+						p1win = true
 					} else {
-						return true, g.p2
+						p2win = true
 					}
 				}
 			}
 			if j+4 < 6 {
 				if spot == g.board[i][j+1] && spot == g.board[i][j+2] && spot == g.board[i][j+3] && spot == g.board[i][j+4] {
 					if spot == "X" {
-						return true, g.p1
+						p1win = true
 					} else {
-						return true, g.p2
+						p2win = true
 					}
 				}
 			}
 			if i+4 < 6 && j+4 < 6 {
 				if spot == g.board[i+1][j+1] && spot == g.board[i+2][j+2] && spot == g.board[i+3][j+3] && spot == g.board[i+4][j+4] {
 					if spot == "X" {
-						return true, g.p1
+						p1win = true
 					} else {
-						return true, g.p2
+						p2win = true
 					}
 				}
 			}
 			if i-4 >= 0 && j+4 < 6 {
 				if spot == g.board[i-1][j+1] && spot == g.board[i-2][j+2] && spot == g.board[i-3][j+3] && spot == g.board[i-4][j+4] {
 					if spot == "X" {
-						return true, g.p1
+						p1win = true
 					} else {
-						return true, g.p2
+						p2win = true
 					}
 				}
 			}
 		}
 	}
-	if g.stage1 && !hasSpace {
+	if p1win && p2win {
+		return true, player.HumanPlayer{"DRAW"}
+	} else if p1win {
+		return true, g.p1
+	} else if p2win {
+		return true, g.p2
+	} else if g.stage1 && !hasSpace {
 		return true, player.HumanPlayer{"DRAW"}
 	} else {
 		return false, player.ComputerPlayer{}
