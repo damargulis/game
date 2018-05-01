@@ -62,8 +62,8 @@ func (g Connect4) GetPlayerTurn() game.Player {
 func (g Connect4) GetHumanInput() game.Move {
 	fmt.Println("Column to move in: ")
 	reader := bufio.NewReader(os.Stdin)
-	test, _ := reader.ReadString('\n')
-	spot := strings.TrimSpace(test)
+	text, _ := reader.ReadString('\n')
+	spot := strings.TrimSpace(text)
 	col, _ := strconv.Atoi(spot)
 	return Connect4Move{col: col}
 }

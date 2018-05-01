@@ -62,49 +62,10 @@ func main() {
 	flag.Parse()
 	ch := make(chan int)
 
-	abaloneWrap := func(p1 string, p2 string, depth1, depth2 int) int {
-		g := game.NewAbalone(p1, p2, depth1, depth2)
-		return game.Play(g, false)
+	pentagoWrap := func(p1 string, p2 string, p1depth int, p2depth int) int {
+		g := game.NewPentago(*p1, *p2, p1depth, p2depth)
+		return = game.Play(g, false)
 	}
-	boxesWrap := func(p1 string, p2 string, depth1 int, depth2 int) int {
-		g := game.NewBoxes(p1, p2, depth1, depth2)
-		return game.Play(g, false)
-	}
-	checkersWrap := func(p1 string, p2 string, depth1 int, depth2 int) int {
-		g := game.NewCheckers(p1, p2, depth1, depth2)
-		return game.Play(g, false)
-	}
-	connect4Wrap := func(p1 string, p2 string, depth1 int, depth2 int) int {
-		g := game.NewConnect4(p1, p2, depth1, depth2)
-		return game.Play(g, false)
-	}
-	mancalaWrap := func(p1 string, p2 string, depth1 int, depth2 int) int {
-		g := game.NewMancala(p1, p2, depth1, depth2)
-		return game.Play(g, false)
-	}
-	nineMensMorrisWrap := func(p1 string, p2 string, depth1, depth2 int) int {
-		g := game.NewNineMensMorris(p1, p2, depth1, depth2)
-		return game.Play(g, false)
-	}
-	reversiWrap := func(p1 string, p2 string, depth1, depth2 int) int {
-		g := game.NewReversi(p1, p2, depth1, depth2)
-		return game.Play(g, false)
-	}
-	tictactoeWrap := func(p1 string, p2 string, depth1 int, depth2 int) int {
-		g := game.NewTicTacToe(p1, p2, depth1, depth2)
-		return game.Play(g, false)
-	}
-	go runExperiment(abaloneWrap, *p1, *p2, "abalone.csv", ch, "Abalone", "abalone.png")
-	go runExperiment(boxesWrap, *p1, *p2, "boxes.csv", ch, "Boxes", "boxes.png")
-	go runExperiment(checkersWrap, *p1, *p2, "checkers.csv", ch, "Checkers", "checkers.png")
-	go runExperiment(connect4Wrap, *p1, *p2, "connect4.csv", ch, "Connect 4", "connect4.png")
-	go runExperiment(mancalaWrap, *p1, *p2, "mancala.csv", ch, "Mancala", "mancala.png")
-	go runExperiment(nineMensMorrisWrap, *p1, *p2, "ninemensmorris.csv", ch, "Nine Men's Morris", "ninemensmorris.png")
-	go runExperiment(reversiWrap, *p1, *p2, "reversi.csv", ch, "Reversi", "reversi.png")
-	go runExperiment(tictactoeWrap, *p1, *p2, "tictactoe.csv", ch, "Tic Tac Toe", "tictactoe.png")
-	i := 0
-	for i < 8 {
-		i++
-		<-ch
-	}
+	go runExperiment(pentagoWrap, *p1, *p2, "pentago.csv", ch, "Pentago", "pentago.png")
+	<-ch
 }
