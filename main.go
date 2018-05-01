@@ -62,10 +62,10 @@ func main() {
 	flag.Parse()
 	ch := make(chan int)
 
-	pentagoWrap := func(p1 string, p2 string, p1depth int, p2depth int) int {
-		g := game.NewPentago(p1, p2, p1depth, p2depth)
+	martianChessWrap := func(p1 string, p2 string, p1depth int, p2depth int) int {
+		g := game.NewMartianChess(p1, p2, p1depth, p2depth)
 		return game.Play(g, false)
 	}
-	go runExperiment(pentagoWrap, *p1, *p2, "pentago.csv", ch, "Pentago", "pentago.png")
+	go runExperiment(martianChessWrap, *p1, *p2, "martianchess.csv", ch, "Martian Chess", "martianchess.png")
 	<-ch
 }
