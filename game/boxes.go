@@ -1,13 +1,9 @@
 package game
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/damargulis/game/interfaces"
 	"github.com/damargulis/game/player"
-	"os"
-	"strconv"
-	"strings"
 )
 
 type Boxes struct {
@@ -22,6 +18,10 @@ type Boxes struct {
 type BoxesMove struct {
 	horizontal bool
 	row, col   int
+}
+
+func (g Boxes) GetBoardDimensions() (int, int) {
+	return len(g.owners), len(g.owners)
 }
 
 func (g Boxes) BoardString() string {
@@ -113,12 +113,8 @@ func (g Boxes) GetPlayerTurn() game.Player {
 func (g Boxes) GetHumanInput() game.Move {
 	colI, rowI := 0, 0
 	for (colI+rowI)%2 == 0 {
-		reader := bufio.NewReader(os.Stdin)
-		text, _ := reader.ReadString('\n')
-		move := strings.Split(strings.TrimSpace(text), ",")
-		row, col := move[0], move[1]
-		rowI, _ = strconv.Atoi(row)
-		colI, _ = strconv.Atoi(col)
+		spot := readInts("Place a line at: ")
+		rowI, colI = spot[0], spot[1]
 	}
 	var horizontal bool
 	if rowI%2 == 0 {

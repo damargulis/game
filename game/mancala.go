@@ -1,13 +1,9 @@
 package game
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/damargulis/game/interfaces"
 	"github.com/damargulis/game/player"
-	"os"
-	"strconv"
-	"strings"
 )
 
 type Mancala struct {
@@ -21,6 +17,10 @@ type Mancala struct {
 
 type MancalaMove struct {
 	row, col int
+}
+
+func (g Mancala) GetBoardDimensions() (int, int) {
+	return len(g.board), len(g.board[0])
 }
 
 func NewMancala(p1 string, p2 string, depth1 int, depth2 int) *Mancala {
@@ -78,11 +78,8 @@ func (g Mancala) GetPlayerTurn() game.Player {
 }
 
 func (g Mancala) GetHumanInput() game.Move {
-	fmt.Println("Col to move: ")
-	reader := bufio.NewReader(os.Stdin)
-	text, _ := reader.ReadString('\n')
-	spot := strings.TrimSpace(text)
-	col, _ := strconv.Atoi(spot)
+	colA := readInts("Col to move: ")
+	col := colA[0]
 	if g.pTurn {
 		return MancalaMove{
 			row: 0,

@@ -6,7 +6,6 @@ import (
 	"github.com/damargulis/game/interfaces"
 	"github.com/damargulis/game/player"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -21,6 +20,10 @@ type Pentago struct {
 type PentagoMove struct {
 	row, col, quad int
 	clockwise      bool
+}
+
+func (g Pentago) GetBoardDimensions() (int, int) {
+	return len(g.board), len(g.board[0])
 }
 
 func NewPentago(p1 string, p2 string, depth1 int, depth2 int) *Pentago {
@@ -70,20 +73,14 @@ func (g Pentago) GetPlayerTurn() game.Player {
 func (g Pentago) GetHumanInput() game.Move {
 	reader := bufio.NewReader(os.Stdin)
 	if g.stage1 {
-		fmt.Println("Spot to place: ")
-		text, _ := reader.ReadString('\n')
-		spot := strings.Split(strings.TrimSpace(text), ",")
-		rowI, _ := strconv.Atoi(spot[0])
-		colI, _ := strconv.Atoi(spot[1])
+		spot1 := readInts("Spot to place: ")
 		return PentagoMove{
-			row: rowI,
-			col: colI,
+			row: spot1[0],
+			col: spot1[1],
 		}
 	} else {
-		fmt.Println("Quadrent to spin: ")
-		text, _ := reader.ReadString('\n')
-		quad := strings.TrimSpace(text)
-		quadI, _ := strconv.Atoi(quad)
+		quad := readInts("Quadren to spin: ")
+		quadI := quad[0]
 		var dir string
 		for dir != "CW" && dir != "CCW" {
 			fmt.Println("Direction (CW/CCW): ")
@@ -200,7 +197,7 @@ func (g Pentago) GameOver() (bool, game.Player) {
 				hasSpace = true
 				continue
 			}
-			if i+4 < 6 {
+			if isInside(g, i+4, j) {
 				if spot == g.board[i+1][j] && spot == g.board[i+2][j] && spot == g.board[i+3][j] && spot == g.board[i+4][j] {
 					if spot == "X" {
 						p1win = true
@@ -209,7 +206,7 @@ func (g Pentago) GameOver() (bool, game.Player) {
 					}
 				}
 			}
-			if j+4 < 6 {
+			if isInside(g, i, j+4) {
 				if spot == g.board[i][j+1] && spot == g.board[i][j+2] && spot == g.board[i][j+3] && spot == g.board[i][j+4] {
 					if spot == "X" {
 						p1win = true
@@ -218,7 +215,7 @@ func (g Pentago) GameOver() (bool, game.Player) {
 					}
 				}
 			}
-			if i+4 < 6 && j+4 < 6 {
+			if isInside(g, i+4, j+4) {
 				if spot == g.board[i+1][j+1] && spot == g.board[i+2][j+2] && spot == g.board[i+3][j+3] && spot == g.board[i+4][j+4] {
 					if spot == "X" {
 						p1win = true
@@ -227,7 +224,7 @@ func (g Pentago) GameOver() (bool, game.Player) {
 					}
 				}
 			}
-			if i-4 >= 0 && j+4 < 6 {
+			if isInside(g, i-4, j+4) {
 				if spot == g.board[i-1][j+1] && spot == g.board[i-2][j+2] && spot == g.board[i-3][j+3] && spot == g.board[i-4][j+4] {
 					if spot == "X" {
 						p1win = true

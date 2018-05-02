@@ -1,13 +1,9 @@
 package game
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/damargulis/game/interfaces"
 	"github.com/damargulis/game/player"
-	"os"
-	"strconv"
-	"strings"
 )
 
 type Connect4 struct {
@@ -19,6 +15,10 @@ type Connect4 struct {
 
 type Connect4Move struct {
 	col int
+}
+
+func (g Connect4) GetBoardDimensions() (int, int) {
+	return len(g.board), len(g.board[0])
 }
 
 func (g Connect4) BoardString() string {
@@ -60,12 +60,8 @@ func (g Connect4) GetPlayerTurn() game.Player {
 }
 
 func (g Connect4) GetHumanInput() game.Move {
-	fmt.Println("Column to move in: ")
-	reader := bufio.NewReader(os.Stdin)
-	text, _ := reader.ReadString('\n')
-	spot := strings.TrimSpace(text)
-	col, _ := strconv.Atoi(spot)
-	return Connect4Move{col: col}
+	col := readInts("Column to move in: ")
+	return Connect4Move{col: col[0]}
 }
 
 func (g Connect4) GetPossibleMoves() []game.Move {
@@ -88,7 +84,7 @@ func (g Connect4) MakeMove(m game.Move) game.Game {
 	move := m.(Connect4Move)
 	col := move.col
 	i := 0
-	for i < 8 && g.board[i][col] == "." {
+	for isInside(g, i, col) && g.board[i][col] == "." {
 		i++
 	}
 	if g.pTurn {
@@ -108,7 +104,7 @@ func (g Connect4) GameOver() (bool, game.Player) {
 				hasSpace = true
 				continue
 			}
-			if i+3 < 8 {
+			if isInside(g, i+3, j) {
 				if g.board[i][j] == g.board[i+1][j] && g.board[i][j] == g.board[i+2][j] && g.board[i][j] == g.board[i+3][j] {
 					if g.board[i][j] == "X" {
 						return true, g.p1
@@ -117,7 +113,7 @@ func (g Connect4) GameOver() (bool, game.Player) {
 					}
 				}
 			}
-			if j+3 < 8 {
+			if isInside(g, i, j+3) {
 				if g.board[i][j] == g.board[i][j+1] && g.board[i][j] == g.board[i][j+2] && g.board[i][j] == g.board[i][j+3] {
 					if g.board[i][j] == "X" {
 						return true, g.p1
@@ -126,7 +122,7 @@ func (g Connect4) GameOver() (bool, game.Player) {
 					}
 				}
 			}
-			if i+3 < 8 && j+3 < 8 {
+			if isInside(g, i+3, j+3) {
 				if g.board[i][j] == g.board[i+1][j+1] && g.board[i][j] == g.board[i+2][j+2] && g.board[i][j] == g.board[i+3][j+3] {
 					if g.board[i][j] == "X" {
 						return true, g.p1
@@ -135,7 +131,7 @@ func (g Connect4) GameOver() (bool, game.Player) {
 					}
 				}
 			}
-			if i-3 >= 0 && j+3 < 8 {
+			if isInside(g, i-3, j+3) {
 				if g.board[i][j] == g.board[i-1][j+1] && g.board[i][j] == g.board[i-2][j+2] && g.board[i][j] == g.board[i-3][j+3] {
 					if g.board[i][j] == "X" {
 						return true, g.p1

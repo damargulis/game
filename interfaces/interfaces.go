@@ -18,4 +18,5 @@ type Game interface {
 	MakeMove(Move) Game
 	GameOver() (bool, Player)
 	CurrentScore(Player) int
+	GetBoardDimensions() (int, int)
 }

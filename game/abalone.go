@@ -1,14 +1,10 @@
 package game
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/damargulis/game/interfaces"
 	"github.com/damargulis/game/player"
 	"math"
-	"os"
-	"strconv"
-	"strings"
 )
 
 type Abalone struct {
@@ -43,6 +39,10 @@ func NewAbalone(p1 string, p2 string, depth1 int, depth2 int) *Abalone {
 	return g
 }
 
+func (g Abalone) GetBoardDimensions() (int, int) {
+	return len(g.board), len(g.board[0])
+}
+
 func (g Abalone) BoardString() string {
 	s := "----------------------\n"
 	rowLabel := 0
@@ -54,7 +54,7 @@ func (g Abalone) BoardString() string {
 		buffer++
 	}
 
-	for startRow < len(g.board) {
+	for isInside(g, startRow, startCol) {
 		i := 0
 		for i < buffer {
 			s += " "
@@ -65,7 +65,7 @@ func (g Abalone) BoardString() string {
 		rowLabel++
 		curRow := startRow
 		curCol := startCol
-		for curRow >= 0 && curCol < len(g.board[curRow]) {
+		for isInside(g, curRow, curCol) {
 			s += fmt.Sprintf("%v ", g.board[curRow][curCol])
 			curRow--
 			curCol++
@@ -87,7 +87,7 @@ func (g Abalone) BoardString() string {
 		rowLabel++
 		curRow := startRow
 		curCol := startCol
-		for curRow >= 0 && curCol < len(g.board[curRow]) {
+		for isInside(g, curRow, curCol) {
 			s += fmt.Sprintf("%v ", g.board[curRow][curCol])
 			curRow--
 			curCol++
@@ -121,28 +121,12 @@ func (g Abalone) humanToGrid(row int, col int) (int, int) {
 }
 
 func (g Abalone) GetHumanInput() game.Move {
-	fmt.Println("Select start marble: ")
-	reader := bufio.NewReader(os.Stdin)
-	text, _ := reader.ReadString('\n')
-	spot1 := strings.Split(strings.TrimSpace(text), ",")
-	row1, col1 := spot1[0], spot1[1]
-	row1I, _ := strconv.Atoi(row1)
-	col1I, _ := strconv.Atoi(col1)
-	fmt.Println("Select end marble: ")
-	text2, _ := reader.ReadString('\n')
-	spot2 := strings.Split(strings.TrimSpace(text2), ",")
-	row2, col2 := spot2[0], spot2[1]
-	row2I, _ := strconv.Atoi(row2)
-	col2I, _ := strconv.Atoi(col2)
-	fmt.Println("Move 1st marble to: ")
-	text3, _ := reader.ReadString('\n')
-	spot3 := strings.Split(strings.TrimSpace(text3), ",")
-	row3, col3 := spot3[0], spot3[1]
-	row3I, _ := strconv.Atoi(row3)
-	col3I, _ := strconv.Atoi(col3)
-	row1I, col1I = g.humanToGrid(row1I, col1I)
-	row2I, col2I = g.humanToGrid(row2I, col2I)
-	row3I, col3I = g.humanToGrid(row3I, col3I)
+	spot1 := readInts("Select start marble: ")
+	spot2 := readInts("Select end marble: ")
+	spot3 := readInts("Move 1st marble to: ")
+	row1I, col1I := g.humanToGrid(spot1[0], spot1[1])
+	row2I, col2I := g.humanToGrid(spot2[0], spot2[1])
+	row3I, col3I := g.humanToGrid(spot3[0], spot3[1])
 	return AbaloneMove{
 		startRow: row1I,
 		startCol: col1I,
@@ -155,11 +139,7 @@ func (g Abalone) GetHumanInput() game.Move {
 
 func (g Abalone) getBroadMoves(i, j, rowDir, colDir int, own, target string) []game.Move {
 	var moves []game.Move
-	if i+rowDir < len(g.board) &&
-		i+rowDir >= 0 &&
-		j+colDir < len(g.board[i+rowDir]) &&
-		j+colDir >= 0 &&
-		g.board[i+rowDir][j+colDir] == "." {
+	if isInside(g, i+rowDir, j+colDir) && g.board[i+rowDir][j+colDir] == "." {
 		broadRowDir := rowDir + 1
 		broadColDir := colDir + 1
 		if broadRowDir >= 2 {
@@ -168,15 +148,9 @@ func (g Abalone) getBroadMoves(i, j, rowDir, colDir int, own, target string) []g
 		if broadColDir >= 2 {
 			broadColDir = -1
 		}
-		if i+broadRowDir >= 0 &&
-			i+broadRowDir < len(g.board) &&
-			j+broadColDir >= 0 &&
-			j+broadColDir < len(g.board[i+broadRowDir]) &&
+		if isInside(g, i+broadRowDir, j+broadColDir) &&
 			g.board[i+broadRowDir][j+broadColDir] == own &&
-			i+broadRowDir+rowDir >= 0 &&
-			i+broadRowDir+rowDir < len(g.board) &&
-			j+broadColDir+colDir >= 0 &&
-			j+broadColDir+colDir < len(g.board[i+broadRowDir+rowDir]) &&
+			isInside(g, i+broadRowDir+rowDir, j+broadColDir+colDir) &&
 			g.board[i+broadRowDir+rowDir][j+broadColDir+colDir] == "." {
 			moves = append(moves, AbaloneMove{
 				startRow: i,
@@ -186,15 +160,9 @@ func (g Abalone) getBroadMoves(i, j, rowDir, colDir int, own, target string) []g
 				moveRow:  i + rowDir,
 				moveCol:  j + colDir,
 			})
-			if i+broadRowDir*2 >= 0 &&
-				i+broadRowDir*2 < len(g.board) &&
-				j+broadColDir*2 >= 0 &&
-				j+broadColDir*2 < len(g.board[i+broadRowDir*2]) &&
+			if isInside(g, i+broadRowDir*2, j+broadColDir*2) &&
 				g.board[i+broadRowDir*2][j+broadColDir*2] == own &&
-				i+broadRowDir*2+rowDir >= 0 &&
-				i+broadRowDir*2+rowDir < len(g.board) &&
-				j+broadColDir*2+colDir >= 0 &&
-				j+broadColDir*2+colDir < len(g.board[i+broadRowDir*2+rowDir]) &&
+				isInside(g, i+broadRowDir*2+rowDir, j+broadColDir*2) &&
 				g.board[i+broadRowDir*2+rowDir][j+broadColDir*2+colDir] == "." {
 				moves = append(moves, AbaloneMove{
 					startRow: i,
@@ -214,15 +182,9 @@ func (g Abalone) getBroadMoves(i, j, rowDir, colDir int, own, target string) []g
 		if broadColDir >= 2 {
 			broadColDir = -1
 		}
-		if i+broadRowDir >= 0 &&
-			i+broadRowDir < len(g.board) &&
-			j+broadColDir >= 0 &&
-			j+broadColDir < len(g.board[i+broadRowDir]) &&
+		if isInside(g, i+broadRowDir, j+broadColDir) &&
 			g.board[i+broadRowDir][j+broadColDir] == own &&
-			i+broadRowDir+rowDir >= 0 &&
-			i+broadRowDir+rowDir < len(g.board) &&
-			j+broadColDir+colDir >= 0 &&
-			j+broadColDir+colDir < len(g.board[i+broadRowDir+rowDir]) &&
+			isInside(g, i+broadRowDir+rowDir, j+broadColDir+colDir) &&
 			g.board[i+broadRowDir+rowDir][j+broadColDir+colDir] == "." {
 			moves = append(moves, AbaloneMove{
 				startRow: i,
@@ -232,15 +194,9 @@ func (g Abalone) getBroadMoves(i, j, rowDir, colDir int, own, target string) []g
 				moveRow:  i + rowDir,
 				moveCol:  j + colDir,
 			})
-			if i+broadRowDir*2 >= 0 &&
-				i+broadRowDir*2 < len(g.board) &&
-				j+broadColDir*2 >= 0 &&
-				j+broadColDir*2 < len(g.board[i+broadRowDir*2]) &&
+			if isInside(g, i+broadRowDir*2, j+broadColDir*2) &&
 				g.board[i+broadRowDir*2][j+broadColDir*2] == own &&
-				i+broadRowDir*2+rowDir >= 0 &&
-				i+broadRowDir*2+rowDir < len(g.board) &&
-				j+broadColDir*2+colDir >= 0 &&
-				j+broadColDir*2+colDir < len(g.board[i+broadRowDir*2+rowDir]) &&
+				isInside(g, i+broadRowDir*2+rowDir, j+broadColDir*2+colDir) &&
 				g.board[i+broadRowDir*2+rowDir][j+broadColDir*2+colDir] == "." {
 				moves = append(moves, AbaloneMove{
 					startRow: i,
@@ -258,19 +214,14 @@ func (g Abalone) getBroadMoves(i, j, rowDir, colDir int, own, target string) []g
 
 func (g Abalone) getArrowMoves(i, j, rowDir, colDir int, owns, target string) []game.Move {
 	var moves []game.Move
-	if i+rowDir < len(g.board) &&
-		i+rowDir >= 0 &&
-		j+colDir < len(g.board[i+rowDir]) &&
-		j+colDir >= 0 && (g.board[i+rowDir][j+colDir] == "." ||
-		g.board[i+rowDir][j+colDir] == target) {
+	if isInside(g, i+rowDir, j+colDir) &&
+		(g.board[i+rowDir][j+colDir] == "." ||
+			g.board[i+rowDir][j+colDir] == target) {
 		backing := 0
 		attacking := 0
 		curRow := i - rowDir
 		curCol := j - colDir
-		for curRow >= 0 &&
-			curRow < len(g.board) &&
-			curCol >= 0 &&
-			curCol < len(g.board[curRow]) &&
+		for isInside(g, curRow, curCol) &&
 			g.board[curRow][curCol] == owns {
 			backing++
 			curRow -= rowDir
@@ -278,19 +229,13 @@ func (g Abalone) getArrowMoves(i, j, rowDir, colDir int, owns, target string) []
 		}
 		curRow = i + rowDir
 		curCol = j + colDir
-		for curRow >= 0 &&
-			curRow < len(g.board) &&
-			curCol >= 0 &&
-			curCol < len(g.board[curRow]) &&
+		for isInside(g, curRow, curCol) &&
 			g.board[curRow][curCol] == target {
 			attacking++
 			curRow += rowDir
 			curCol += colDir
 		}
-		if curRow >= 0 &&
-			curRow < len(g.board) &&
-			curCol >= 0 &&
-			curCol < len(g.board[curRow]) &&
+		if isInside(g, curRow, curCol) &&
 			g.board[curRow][curCol] == owns {
 			return moves
 		}
@@ -394,7 +339,7 @@ func (g Abalone) MakeMove(m game.Move) game.Game {
 	curRow = move.moveRow
 	curCol = move.moveCol
 	var replacing string
-	if curRow >= 0 && curRow < len(g.board) && curCol >= 0 && curCol < len(g.board[curRow]) {
+	if isInside(g, curRow, curCol) {
 		replacing = g.board[curRow][curCol]
 	} else {
 		replacing = " "
@@ -409,7 +354,7 @@ func (g Abalone) MakeMove(m game.Move) game.Game {
 		curRow = move.moveRow + moveRowDir
 		curCol = move.moveCol + moveColDir
 		var newSpot string
-		if curRow >= 0 && curRow < len(g.board) && curCol >= 0 && curCol < len(g.board[curRow]) {
+		if isInside(g, curRow, curCol) {
 			newSpot = g.board[curRow][curCol]
 		} else {
 			newSpot = " "
@@ -417,7 +362,7 @@ func (g Abalone) MakeMove(m game.Move) game.Game {
 		for newSpot == "X" || newSpot == "O" {
 			curRow += moveRowDir
 			curCol += moveColDir
-			if curRow >= 0 && curRow < len(g.board) && curCol >= 0 && curCol < len(g.board[curRow]) {
+			if isInside(g, curRow, curCol) {
 				newSpot = g.board[curRow][curCol]
 			} else {
 				newSpot = " "
@@ -460,7 +405,7 @@ func (g Abalone) _distToEdge(row, col, rowDir, colDir int) int {
 	curRow := row
 	curCol := col
 	dist := 0
-	for curRow >= 0 && curRow < len(g.board) && curCol >= 0 && curCol < len(g.board[curRow]) && g.board[curRow][curCol] != " " {
+	for isInside(g, curRow, curCol) && g.board[curRow][curCol] != " " {
 		curRow += rowDir
 		curCol += colDir
 		dist++
