@@ -149,159 +149,68 @@ func (g Checkers) CurrentScore(p game.Player) int {
 	}
 }
 
+func (g Checkers) checkJump(i, j, rowDir, colDir int) []game.Move {
+	var moves []game.Move
+	peice := g.board[i][j]
+	var target1, target2 string
+	if peice == "x" || peice == "X" {
+		target1 = "o"
+		target2 = "O"
+	} else {
+		target1 = "x"
+		target2 = "X"
+	}
+	if isInside(g, i+rowDir*2, j+colDir*2) && g.board[i+rowDir*2][j+colDir*2] == "." {
+		if g.board[i+rowDir][j+colDir] == target1 || g.board[i+rowDir][j+colDir] == target2 {
+			moves = append(moves, CheckersMove{
+				row1: i,
+				col1: j,
+				row2: i + rowDir*2,
+				col2: j + colDir*2,
+			})
+		}
+	}
+	return moves
+}
+
+func (g Checkers) checkMove(i, j, rowDir, colDir int) []game.Move {
+	var moves []game.Move
+	if isInside(g, i+rowDir, j+colDir) && g.board[i+rowDir][j+colDir] == "." {
+		moves = append(moves, CheckersMove{
+			row1: i,
+			col1: j,
+			row2: i + rowDir,
+			col2: j + colDir,
+		})
+	}
+	return moves
+}
+
 func (g Checkers) GetPossibleMoves() []game.Move {
 	if g.didJustJump {
 		var moves []game.Move
 		peice := g.board[g.jumpRow][g.jumpCol]
 		row := g.jumpRow
 		col := g.jumpCol
-		if peice == "x" || peice == "X" {
-			if isInside(g, row-2, col-2) && g.board[row-2][col-2] == "." && (g.board[row-1][col-1] == "o" || g.board[row-1][col-1] == "O") {
-				moves = append(moves, CheckersMove{
-					row1: row,
-					col1: col,
-					row2: row - 2,
-					col2: col - 2,
-				})
-			}
-			if isInside(g, row-2, col+2) && g.board[row-2][col+2] == "." && (g.board[row-1][col+1] == "o" || g.board[row-1][col+1] == "O") {
-				moves = append(moves, CheckersMove{
-					row1: row,
-					col1: col,
-					row2: row - 2,
-					col2: col + 2,
-				})
-			}
+		if peice == "x" || peice == "X" || peice == "O" {
+			moves = append(moves, g.checkJump(row, col, -1, -1)...)
+			moves = append(moves, g.checkJump(row, col, -1, 1)...)
 		}
-		if peice == "X" {
-			if isInside(g, row+2, col-2) && g.board[row+2][col-2] == "." && (g.board[row+1][col-1] == "o" || g.board[row+1][col-1] == "O") {
-				moves = append(moves, CheckersMove{
-					row1: row,
-					col1: col,
-					row2: row + 2,
-					col2: col - 2,
-				})
-			}
-			if isInside(g, row+2, col+2) && g.board[row+2][col+2] == "." && (g.board[row+1][col+1] == "o" || g.board[row+1][col+1] == "O") {
-				moves = append(moves, CheckersMove{
-					row1: row,
-					col1: col,
-					row2: row + 2,
-					col2: col + 2,
-				})
-			}
-		}
-		if peice == "o" || peice == "O" {
-			if isInside(g, row+2, col-2) && g.board[row+2][col-2] == "." && (g.board[row+1][col-1] == "x" || g.board[row+1][col-1] == "X") {
-				moves = append(moves, CheckersMove{
-					row1: row,
-					col1: col,
-					row2: row + 2,
-					col2: col - 2,
-				})
-			}
-			if isInside(g, row+2, col+2) && g.board[row+2][col+2] == "." && (g.board[row+1][col+1] == "x" || g.board[row+1][col+1] == "X") {
-				moves = append(moves, CheckersMove{
-					row1: row,
-					col1: col,
-					row2: row + 2,
-					col2: col + 2,
-				})
-			}
-		}
-		if peice == "O" {
-			if isInside(g, row-2, col-2) && g.board[row-2][col-2] == "." && (g.board[row-1][col-1] == "x" || g.board[row-1][col-1] == "X") {
-				moves = append(moves, CheckersMove{
-					row1: row,
-					col1: col,
-					row2: row - 2,
-					col2: col - 2,
-				})
-			}
-			if isInside(g, row-2, col+2) && g.board[row-2][col+2] == "." && (g.board[row-1][col+1] == "x" || g.board[row-1][col+1] == "X") {
-				moves = append(moves, CheckersMove{
-					row1: row,
-					col1: col,
-					row2: row - 2,
-					col2: col + 2,
-				})
-			}
+		if peice == "o" || peice == "O" || peice == "X" {
+			moves = append(moves, g.checkJump(row, col, 1, -1)...)
+			moves = append(moves, g.checkJump(row, col, 1, 1)...)
 		}
 		return moves
 	}
 	var moves []game.Move
 	for i, row := range g.board {
 		for j, spot := range row {
-			if g.pTurn && (spot == "X" || spot == "x") {
-				if isInside(g, i-2, j-2) && g.board[i-2][j-2] == "." && (g.board[i-1][j-1] == "O" || g.board[i-1][j-1] == "o") {
-					moves = append(moves, CheckersMove{
-						row1: i,
-						col1: j,
-						row2: i - 2,
-						col2: j - 2,
-					})
-				}
-				if isInside(g, i-2, j+2) && g.board[i-2][j+2] == "." && (g.board[i-1][j+1] == "O" || g.board[i-1][j+1] == "o") {
-					moves = append(moves, CheckersMove{
-						row1: i,
-						col1: j,
-						row2: i - 2,
-						col2: j + 2,
-					})
-				}
-				if spot == "X" {
-					if isInside(g, i+2, j-2) && g.board[i+2][j-2] == "." && (g.board[i+1][j-1] == "O" || g.board[i+1][j-1] == "o") {
-						moves = append(moves, CheckersMove{
-							row1: i,
-							col1: j,
-							row2: i + 2,
-							col2: j - 2,
-						})
-					}
-					if isInside(g, i+2, j+2) && g.board[i+2][j+2] == "." && (g.board[i+1][j+1] == "O" || g.board[i+1][j+1] == "o") {
-						moves = append(moves, CheckersMove{
-							row1: i,
-							col1: j,
-							row2: i + 2,
-							col2: j + 2,
-						})
-					}
-				}
-			} else if !g.pTurn && (spot == "O" || spot == "o") {
-				if isInside(g, i+2, j-2) && g.board[i+2][j-2] == "." && (g.board[i+1][j-1] == "X" || g.board[i+1][j-1] == "x") {
-					moves = append(moves, CheckersMove{
-						row1: i,
-						col1: j,
-						row2: i + 2,
-						col2: j - 2,
-					})
-				}
-				if isInside(g, i+2, j+2) && g.board[i+2][j+2] == "." && (g.board[i+1][j+1] == "X" || g.board[i+1][j+1] == "x") {
-					moves = append(moves, CheckersMove{
-						row1: i,
-						col1: j,
-						row2: i + 2,
-						col2: j + 2,
-					})
-				}
-				if spot == "O" {
-					if isInside(g, i-2, j-2) && g.board[i-2][j-2] == "." && (g.board[i-1][j-1] == "x" || g.board[i-1][j-1] == "X") {
-						moves = append(moves, CheckersMove{
-							row1: i,
-							col1: j,
-							row2: i - 2,
-							col2: j - 2,
-						})
-					}
-					if isInside(g, i-2, j+2) && g.board[i-2][j+2] == "." && (g.board[i-1][j+1] == "x" || g.board[i-1][j+1] == "X") {
-						moves = append(moves, CheckersMove{
-							row1: i,
-							col1: j,
-							row2: i - 2,
-							col2: j + 2,
-						})
-					}
-				}
+			if (g.pTurn && (spot == "X" || spot == "x")) || (!g.pTurn && spot == "O") {
+				moves = append(moves, g.checkJump(i, j, -1, -1)...)
+				moves = append(moves, g.checkJump(i, j, -1, 1)...)
+			} else if (!g.pTurn && (spot == "O" || spot == "o")) || (g.pTurn && spot == "X") {
+				moves = append(moves, g.checkJump(i, j, 1, -1)...)
+				moves = append(moves, g.checkJump(i, j, 1, 1)...)
 			}
 		}
 	}
@@ -310,76 +219,13 @@ func (g Checkers) GetPossibleMoves() []game.Move {
 	}
 	for i, row := range g.board {
 		for j, spot := range row {
-			if g.pTurn && (spot == "X" || spot == "x") {
-				if isInside(g, i-1, j-1) && g.board[i-1][j-1] == "." {
-					moves = append(moves, CheckersMove{
-						row1: i,
-						col1: j,
-						row2: i - 1,
-						col2: j - 1,
-					})
-				}
-				if isInside(g, i-1, j+1) && g.board[i-1][j+1] == "." {
-					moves = append(moves, CheckersMove{
-						row1: i,
-						col1: j,
-						row2: i - 1,
-						col2: j + 1,
-					})
-				}
-				if spot == "X" {
-					if isInside(g, i+1, j-1) && g.board[i+1][j-1] == "." {
-						moves = append(moves, CheckersMove{
-							row1: i,
-							col1: j,
-							row2: i + 1,
-							col2: j - 1,
-						})
-					}
-					if isInside(g, i+1, j+1) && g.board[i+1][j+1] == "." {
-						moves = append(moves, CheckersMove{
-							row1: i,
-							col1: j,
-							row2: i + 1,
-							col2: j + 1,
-						})
-					}
-				}
-			} else if !g.pTurn && (spot == "O" || spot == "o") {
-				if isInside(g, i+1, j-1) && g.board[i+1][j-1] == "." {
-					moves = append(moves, CheckersMove{
-						row1: i,
-						col1: j,
-						row2: i + 1,
-						col2: j - 1,
-					})
-				}
-				if isInside(g, i+1, j+1) && g.board[i+1][j+1] == "." {
-					moves = append(moves, CheckersMove{
-						row1: i,
-						col1: j,
-						row2: i + 1,
-						col2: j + 1,
-					})
-				}
-				if spot == "O" {
-					if isInside(g, i-1, j-1) && g.board[i-1][j-1] == "." {
-						moves = append(moves, CheckersMove{
-							row1: i,
-							col1: j,
-							row2: i - 1,
-							col2: j - 1,
-						})
-					}
-					if isInside(g, i-1, j-1) && g.board[i-1][j+1] == "." {
-						moves = append(moves, CheckersMove{
-							row1: i,
-							col1: j,
-							row2: i - 1,
-							col2: j + 1,
-						})
-					}
-				}
+			if (g.pTurn && (spot == "X" || spot == "x")) || (!g.pTurn && spot == "O") {
+				moves = append(moves, g.checkMove(i, j, -1, -1)...)
+				moves = append(moves, g.checkMove(i, j, -1, 1)...)
+			}
+			if (!g.pTurn && (spot == "O" || spot == "o")) || (g.pTurn && spot == "X") {
+				moves = append(moves, g.checkMove(i, j, 1, -1)...)
+				moves = append(moves, g.checkMove(i, j, 1, 1)...)
 			}
 		}
 	}

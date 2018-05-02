@@ -137,76 +137,52 @@ func (g Abalone) GetHumanInput() game.Move {
 	}
 }
 
+func (g Abalone) _getBroadMoves(i, j, rowDir, colDir, broadRowDir, broadColDir int, own, target string) []game.Move {
+	var moves []game.Move
+	if isInside(g, i+broadRowDir, j+broadColDir) &&
+		g.board[i+broadRowDir][j+broadColDir] == own &&
+		isInside(g, i+broadRowDir+rowDir, j+broadColDir+colDir) &&
+		g.board[i+broadRowDir+rowDir][j+broadColDir+colDir] == "." {
+		moves = append(moves, AbaloneMove{
+			startRow: i,
+			startCol: j,
+			endRow:   i + broadRowDir,
+			endCol:   j + broadColDir,
+			moveRow:  i + rowDir,
+			moveCol:  j + colDir,
+		})
+		if isInside(g, i+broadRowDir*2, j+broadColDir*2) &&
+			g.board[i+broadRowDir*2][j+broadColDir*2] == own &&
+			isInside(g, i+broadRowDir*2+rowDir, j+broadColDir*2) &&
+			g.board[i+broadRowDir*2+rowDir][j+broadColDir*2+colDir] == "." {
+			moves = append(moves, AbaloneMove{
+				startRow: i,
+				startCol: j,
+				endRow:   i + broadRowDir*2,
+				endCol:   j + broadColDir*2,
+				moveRow:  i + rowDir,
+				moveCol:  j + colDir,
+			})
+		}
+	}
+	return moves
+}
+
 func (g Abalone) getBroadMoves(i, j, rowDir, colDir int, own, target string) []game.Move {
 	var moves []game.Move
 	if isInside(g, i+rowDir, j+colDir) && g.board[i+rowDir][j+colDir] == "." {
-		broadRowDir := rowDir + 1
-		broadColDir := colDir + 1
-		if broadRowDir >= 2 {
-			broadRowDir = -1
-		}
-		if broadColDir >= 2 {
-			broadColDir = -1
-		}
-		if isInside(g, i+broadRowDir, j+broadColDir) &&
-			g.board[i+broadRowDir][j+broadColDir] == own &&
-			isInside(g, i+broadRowDir+rowDir, j+broadColDir+colDir) &&
-			g.board[i+broadRowDir+rowDir][j+broadColDir+colDir] == "." {
-			moves = append(moves, AbaloneMove{
-				startRow: i,
-				startCol: j,
-				endRow:   i + broadRowDir,
-				endCol:   j + broadColDir,
-				moveRow:  i + rowDir,
-				moveCol:  j + colDir,
-			})
-			if isInside(g, i+broadRowDir*2, j+broadColDir*2) &&
-				g.board[i+broadRowDir*2][j+broadColDir*2] == own &&
-				isInside(g, i+broadRowDir*2+rowDir, j+broadColDir*2) &&
-				g.board[i+broadRowDir*2+rowDir][j+broadColDir*2+colDir] == "." {
-				moves = append(moves, AbaloneMove{
-					startRow: i,
-					startCol: j,
-					endRow:   i + broadRowDir*2,
-					endCol:   j + broadColDir*2,
-					moveRow:  i + rowDir,
-					moveCol:  j + colDir,
-				})
+		broadRowDir := rowDir
+		broadColDir := colDir
+		for k := 0; k < 2; k++ {
+			broadRowDir++
+			broadColDir++
+			if broadRowDir >= 2 {
+				broadRowDir = -1
 			}
-		}
-		broadRowDir++
-		broadColDir++
-		if broadRowDir >= 2 {
-			broadRowDir = -1
-		}
-		if broadColDir >= 2 {
-			broadColDir = -1
-		}
-		if isInside(g, i+broadRowDir, j+broadColDir) &&
-			g.board[i+broadRowDir][j+broadColDir] == own &&
-			isInside(g, i+broadRowDir+rowDir, j+broadColDir+colDir) &&
-			g.board[i+broadRowDir+rowDir][j+broadColDir+colDir] == "." {
-			moves = append(moves, AbaloneMove{
-				startRow: i,
-				startCol: j,
-				endRow:   i + broadRowDir,
-				endCol:   j + broadColDir,
-				moveRow:  i + rowDir,
-				moveCol:  j + colDir,
-			})
-			if isInside(g, i+broadRowDir*2, j+broadColDir*2) &&
-				g.board[i+broadRowDir*2][j+broadColDir*2] == own &&
-				isInside(g, i+broadRowDir*2+rowDir, j+broadColDir*2+colDir) &&
-				g.board[i+broadRowDir*2+rowDir][j+broadColDir*2+colDir] == "." {
-				moves = append(moves, AbaloneMove{
-					startRow: i,
-					startCol: j,
-					endRow:   i + broadRowDir*2,
-					endCol:   j + broadColDir*2,
-					moveRow:  i + rowDir,
-					moveCol:  j + colDir,
-				})
+			if broadColDir >= 2 {
+				broadColDir = -1
 			}
+			moves = append(moves, g._getBroadMoves(i, j, rowDir, colDir, broadRowDir, broadColDir, own, target)...)
 		}
 	}
 	return moves

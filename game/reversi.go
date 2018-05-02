@@ -66,130 +66,45 @@ func (g Reversi) GetHumanInput() game.Move {
 	return ReversiMove{row: spot[0], col: spot[1]}
 }
 
+func (g Reversi) checkMove(i, j, rowDir, colDir int) bool {
+	var target, match string
+	if g.pTurn {
+		target, match = "O", "X"
+	} else {
+		target, match = "X", "O"
+	}
+	if isInside(g, i+rowDir, j+colDir) && g.board[i+rowDir][j+colDir] == target {
+		rowCheck := i + rowDir
+		colCheck := j + colDir
+		for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
+			rowCheck += rowDir
+			colCheck += colDir
+		}
+		if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
+			return true
+		}
+	}
+	return false
+}
+
 func (g Reversi) GetPossibleMoves() []game.Move {
 	var moves []game.Move
 	for i, row := range g.board {
 		for j, spot := range row {
 			if spot == "." {
-				var target, match string
-				if g.pTurn {
-					target, match = "O", "X"
-				} else {
-					target, match = "X", "O"
-				}
-				if isInside(g, i, j+1) && g.board[i][j+1] == target {
-					rowCheck := i
-					colCheck := j + 1
-					for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-						colCheck++
-					}
-					if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-						moves = append(moves, ReversiMove{
-							row: i,
-							col: j,
-						})
-						continue
-					}
-				}
-				if isInside(g, i+1, j+1) && g.board[i+1][j+1] == target {
-					rowCheck := i + 1
-					colCheck := j + 1
-					for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-						colCheck++
-						rowCheck++
-					}
-					if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-						moves = append(moves, ReversiMove{
-							row: i,
-							col: j,
-						})
-						continue
-					}
-				}
-				if isInside(g, i+1, j) && g.board[i+1][j] == target {
-					rowCheck := i + 1
-					colCheck := j
-					for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-						rowCheck++
-					}
-					if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-						moves = append(moves, ReversiMove{
-							row: i,
-							col: j,
-						})
-						continue
-					}
-				}
-				if isInside(g, i+1, j-1) && g.board[i+1][j-1] == target {
-					rowCheck := i + 1
-					colCheck := j - 1
-					for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-						rowCheck++
-						colCheck--
-					}
-					if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-						moves = append(moves, ReversiMove{
-							row: i,
-							col: j,
-						})
-						continue
-					}
-				}
-				if isInside(g, i, j-1) && g.board[i][j-1] == target {
-					rowCheck := i
-					colCheck := j - 1
-					for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-						colCheck--
-					}
-					if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-						moves = append(moves, ReversiMove{
-							row: i,
-							col: j,
-						})
-						continue
-					}
-				}
-				if isInside(g, i-1, j-1) && g.board[i-1][j-1] == target {
-					rowCheck := i - 1
-					colCheck := j - 1
-					for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-						rowCheck--
-						colCheck--
-					}
-					if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-						moves = append(moves, ReversiMove{
-							row: i,
-							col: j,
-						})
-						continue
-					}
-				}
-				if isInside(g, i-1, j) && g.board[i-1][j] == target {
-					rowCheck := i - 1
-					colCheck := j
-					for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-						rowCheck--
-					}
-					if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-						moves = append(moves, ReversiMove{
-							row: i,
-							col: j,
-						})
-					}
-				}
-				if isInside(g, i-1, j+1) && g.board[i-1][j+1] == target {
-					rowCheck := i - 1
-					colCheck := j + 1
-					for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-						rowCheck--
-						colCheck++
-					}
-					if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-						moves = append(moves, ReversiMove{
-							row: i,
-							col: j,
-						})
-					}
+				if g.checkMove(i, j, 0, 1) ||
+					g.checkMove(i, j, 1, 1) ||
+					g.checkMove(i, j, 1, 0) ||
+					g.checkMove(i, j, 1, 0) ||
+					g.checkMove(i, j, 1, -1) ||
+					g.checkMove(i, j, 0, -1) ||
+					g.checkMove(i, j, -1, -1) ||
+					g.checkMove(i, j, -1, 0) ||
+					g.checkMove(i, j, -1, 1) {
+					moves = append(moves, ReversiMove{
+						row: i,
+						col: j,
+					})
 				}
 			}
 		}
@@ -202,115 +117,46 @@ func (g Reversi) GetTurn(p game.Player) game.Move {
 	return m
 }
 
-func (g Reversi) MakeMove(m game.Move) game.Game {
-	move := m.(ReversiMove)
+func (g Reversi) checkAndFill(i, j, rowDir, colDir int) Reversi {
 	var target, match string
 	if g.pTurn {
 		target, match = "O", "X"
 	} else {
 		target, match = "X", "O"
 	}
+	if isInside(g, i+rowDir, j+colDir) && g.board[i+rowDir][j+colDir] == target {
+		rowCheck := i + rowDir
+		colCheck := j + colDir
+		for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
+			rowCheck += rowDir
+			colCheck += colDir
+		}
+		if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
+			for r, c := i, j; r != rowCheck || c != colCheck; r, c = r+rowDir, c+colDir {
+				g.board[r][c] = match
+			}
+		}
+	}
+	return g
+}
+
+func (g Reversi) MakeMove(m game.Move) game.Game {
+	move := m.(ReversiMove)
+	var match string
+	if g.pTurn {
+		match = "X"
+	} else {
+		match = "O"
+	}
 	g.board[move.row][move.col] = match
-	if isInside(g, move.row, move.col+1) && g.board[move.row][move.col+1] == target {
-		rowCheck := move.row
-		colCheck := move.col + 1
-		for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-			colCheck++
-		}
-		if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-			for i, j := move.row, move.col; i != rowCheck || j != colCheck; j++ {
-				g.board[i][j] = match
-			}
-		}
-	}
-	if isInside(g, move.row+1, move.col+1) && g.board[move.row+1][move.col+1] == target {
-		rowCheck := move.row + 1
-		colCheck := move.col + 1
-		for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-			rowCheck++
-			colCheck++
-		}
-		if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-			for i, j := move.row, move.col; i != rowCheck || j != colCheck; i, j = i+1, j+1 {
-				g.board[i][j] = match
-			}
-		}
-	}
-	if isInside(g, move.row+1, move.col) && g.board[move.row+1][move.col] == target {
-		rowCheck := move.row + 1
-		colCheck := move.col
-		for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-			rowCheck++
-		}
-		if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-			for i, j := move.row, move.col; i != rowCheck || j != colCheck; i++ {
-				g.board[i][j] = match
-			}
-		}
-	}
-	if isInside(g, move.row+1, move.col-1) && g.board[move.row+1][move.col-1] == target {
-		rowCheck := move.row + 1
-		colCheck := move.col - 1
-		for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-			rowCheck++
-			colCheck--
-		}
-		if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-			for i, j := move.row, move.col; i != rowCheck || j != colCheck; i, j = i+1, j-1 {
-				g.board[i][j] = match
-			}
-		}
-	}
-	if isInside(g, move.row, move.col-1) && g.board[move.row][move.col-1] == target {
-		rowCheck := move.row
-		colCheck := move.col - 1
-		for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-			colCheck--
-		}
-		if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-			for i, j := move.row, move.col; i != rowCheck || j != colCheck; j-- {
-				g.board[i][j] = match
-			}
-		}
-	}
-	if isInside(g, move.row-1, move.col-1) && g.board[move.row-1][move.col-1] == target {
-		rowCheck := move.row - 1
-		colCheck := move.col - 1
-		for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-			rowCheck--
-			colCheck--
-		}
-		if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-			for i, j := move.row, move.col; i != rowCheck || j != colCheck; i, j = i-1, j-1 {
-				g.board[i][j] = match
-			}
-		}
-	}
-	if isInside(g, move.row-1, move.col) && g.board[move.row-1][move.col] == target {
-		rowCheck := move.row - 1
-		colCheck := move.col
-		for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-			rowCheck--
-		}
-		if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-			for i, j := move.row, move.col; i != rowCheck || j != colCheck; i-- {
-				g.board[i][j] = match
-			}
-		}
-	}
-	if isInside(g, move.row-1, move.col+1) && g.board[move.row-1][move.col+1] == target {
-		rowCheck := move.row - 1
-		colCheck := move.col + 1
-		for isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == target {
-			rowCheck--
-			colCheck++
-		}
-		if isInside(g, rowCheck, colCheck) && g.board[rowCheck][colCheck] == match {
-			for i, j := move.row, move.col; i != rowCheck || j != colCheck; i, j = i-1, j+1 {
-				g.board[i][j] = match
-			}
-		}
-	}
+	g = g.checkAndFill(move.row, move.col, 0, 1)
+	g = g.checkAndFill(move.row, move.col, 1, 1)
+	g = g.checkAndFill(move.row, move.col, 1, 0)
+	g = g.checkAndFill(move.row, move.col, 1, -1)
+	g = g.checkAndFill(move.row, move.col, 0, -1)
+	g = g.checkAndFill(move.row, move.col, -1, -1)
+	g = g.checkAndFill(move.row, move.col, -1, 0)
+	g = g.checkAndFill(move.row, move.col, -1, 1)
 	g.pTurn = !g.pTurn
 	possibleMoves := g.GetPossibleMoves()
 	if len(possibleMoves) == 0 {

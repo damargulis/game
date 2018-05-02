@@ -96,6 +96,13 @@ func (g Connect4) MakeMove(m game.Move) game.Game {
 	return g
 }
 
+func (g Connect4) checkMatch(i, j, rowDir, colDir int) bool {
+	return isInside(g, i+rowDir*3, j+colDir+3) &&
+		g.board[i][j] == g.board[i+rowDir][j+colDir] &&
+		g.board[i][j] == g.board[i+rowDir*2][j+colDir*2] &&
+		g.board[i][j] == g.board[i+rowDir*3][j+colDir*3]
+}
+
 func (g Connect4) GameOver() (bool, game.Player) {
 	hasSpace := false
 	for i, row := range g.board {
@@ -104,40 +111,32 @@ func (g Connect4) GameOver() (bool, game.Player) {
 				hasSpace = true
 				continue
 			}
-			if isInside(g, i+3, j) {
-				if g.board[i][j] == g.board[i+1][j] && g.board[i][j] == g.board[i+2][j] && g.board[i][j] == g.board[i+3][j] {
-					if g.board[i][j] == "X" {
-						return true, g.p1
-					} else {
-						return true, g.p2
-					}
+			if g.checkMatch(i, j, 1, 0) {
+				if g.board[i][j] == "X" {
+					return true, g.p1
+				} else {
+					return true, g.p2
 				}
 			}
-			if isInside(g, i, j+3) {
-				if g.board[i][j] == g.board[i][j+1] && g.board[i][j] == g.board[i][j+2] && g.board[i][j] == g.board[i][j+3] {
-					if g.board[i][j] == "X" {
-						return true, g.p1
-					} else {
-						return true, g.p2
-					}
+			if g.checkMatch(i, j, 0, 1) {
+				if g.board[i][j] == "X" {
+					return true, g.p1
+				} else {
+					return true, g.p2
 				}
 			}
-			if isInside(g, i+3, j+3) {
-				if g.board[i][j] == g.board[i+1][j+1] && g.board[i][j] == g.board[i+2][j+2] && g.board[i][j] == g.board[i+3][j+3] {
-					if g.board[i][j] == "X" {
-						return true, g.p1
-					} else {
-						return true, g.p2
-					}
+			if g.checkMatch(i, j, 1, 1) {
+				if g.board[i][j] == "X" {
+					return true, g.p1
+				} else {
+					return true, g.p2
 				}
 			}
-			if isInside(g, i-3, j+3) {
-				if g.board[i][j] == g.board[i-1][j+1] && g.board[i][j] == g.board[i-2][j+2] && g.board[i][j] == g.board[i-3][j+3] {
-					if g.board[i][j] == "X" {
-						return true, g.p1
-					} else {
-						return true, g.p2
-					}
+			if g.checkMatch(i, j, -1, 1) {
+				if g.board[i][j] == "X" {
+					return true, g.p1
+				} else {
+					return true, g.p2
 				}
 			}
 		}

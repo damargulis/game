@@ -65,6 +65,6 @@ func main() {
 	flag.Parse()
 	//ch := make(chan int)
 
-	g := game.NewCheckers(*p1, *p2, 10, 10)
+	g := game.NewReversi(*p1, *p2, 30, 30)
 	_ = game.Play(g, true)
 }
