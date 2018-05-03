@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/damargulis/game/game"
-	interfaces "github.com/damargulis/game/interfaces"
+	//	interfaces "github.com/damargulis/game/interfaces"
 	"github.com/damargulis/graph"
 	"math/rand"
 	"os"
@@ -22,10 +22,10 @@ func writeOutput(fileName string, p1depth, p2depth, p1wins, p2wins, ties int, ti
 	}
 }
 
-func runExperiment(wrapper func(string, string, int, int) int, p1 string, p2 string, outputFile string, ch chan int, title string, graphFile string) {
+func runExperiment(wrapper func(string, string, int, int) int, p1 string, p2 string, outputFile string, title string, graphFile string) {
 	for i := 0; i < 500; i++ {
-		for curMax := 0; curMax < 40; curMax++ {
-			for curMin := 0; curMin < curMax; curMin++ {
+		for curMax := 0; curMax < 40; curMax += 1 {
+			for curMin := 0; curMin < curMax; curMin += 1 {
 				wins := [3]int{0, 0, 0}
 				start := time.Now()
 				win := wrapper(p1, p2, curMax, curMin)
@@ -56,30 +56,83 @@ func runExperiment(wrapper func(string, string, int, int) int, p1 string, p2 str
 		}
 		graph.CreateGraph(title, outputFile, graphFile)
 	}
-	ch <- 0
 }
 
 func main() {
 	rand.Seed(time.Now().Unix())
-	p1 := flag.String("p1", "Human", "Player 1")
-	p2 := flag.String("p2", "Alphabeta", "Player 2")
+	p1 := flag.String("p1", "MCTEST", "Player 1")
+	p2 := flag.String("p2", "Montecarlo", "Player 2")
 	flag.Parse()
-	//ch := make(chan int)
-	wins := 0
-	games := [10]interfaces.Game{
-		game.NewTicTacToe(*p1, *p2, 1000, 0),
-		game.NewReversi(*p1, *p2, 33, 25),
-		game.NewPentago(*p1, *p2, 65, 50),
-		game.NewNineMensMorris(*p1, *p2, 50, 35),
-		game.NewMartianChess(*p1, *p2, 80, 55),
-		game.NewMancala(*p1, *p2, 60, 40),
-		game.NewConnect4(*p1, *p2, 55, 30),
-		game.NewCheckers(*p1, *p2, 45, 30),
-		game.NewBoxes(*p1, *p2, 80, 50),
-		game.NewAbalone(*p1, *p2, 85, 60),
+
+	ch := make(chan int)
+	nineWrap := func(p1, p2 string, depth1, depth2 int) int {
+		g := game.NewNineMensMorris(p1, p2, depth1, depth2)
+		return game.Play(g, false)
 	}
-	for _, g := range games {
-		_ = game.Play(g, true)
+	pentagoWrap := func(p1, p2 string, depth1, depth2 int) int {
+		g := game.NewPentago(p1, p2, depth1, depth2)
+		return game.Play(g, false)
 	}
-	fmt.Println("Total wins: ", wins)
+	reversiWrap := func(p1, p2 string, depth1, depth2 int) int {
+		g := game.NewReversi(p1, p2, depth1, depth2)
+		return game.Play(g, false)
+	}
+	ticWrap := func(p1, p2 string, depth1, depth2 int) int {
+		g := game.NewTicTacToe(p1, p2, depth1, depth2)
+		return game.Play(g, false)
+	}
+	martianWrap := func(p1, p2 string, depth1, depth2 int) int {
+		g := game.NewMartianChess(p1, p2, depth1, depth2)
+		return game.Play(g, false)
+	}
+	mancalaWrap := func(p1, p2 string, depth1, depth2 int) int {
+		g := game.NewMancala(p1, p2, depth1, depth2)
+		return game.Play(g, false)
+	}
+	connectWrap := func(p1, p2 string, depth1, depth2 int) int {
+		g := game.NewConnect4(p1, p2, depth1, depth2)
+		return game.Play(g, false)
+	}
+	checkersWrap := func(p1, p2 string, depth1, depth2 int) int {
+		g := game.NewCheckers(p1, p2, depth1, depth2)
+		return game.Play(g, false)
+	}
+	boxesWrap := func(p1, p2 string, depth1, depth2 int) int {
+		g := game.NewBoxes(p1, p2, depth1, depth2)
+		return game.Play(g, false)
+	}
+	abaloneWrap := func(p1, p2 string, depth1, depth2 int) int {
+		g := game.NewAbalone(p1, p2, depth1, depth2)
+		return game.Play(g, false)
+	}
+	go runExperiment(connectWrap, *p1, *p2, "connect4_mc.csv", "Connect 4", "connect_mc.png")
+	go runExperiment(mancalaWrap, *p1, *p2, "mancala_mc.csv", "Mancala", "mancala_mc.png")
+	go runExperiment(martianWrap, *p1, *p2, "martianchess_mc.csv", "Martian Chess", "martianchess_mc.png")
+	go runExperiment(reversiWrap, *p1, *p2, "reversi_mc.csv", "Reversi", "reversi_mc.png")
+	go runExperiment(pentagoWrap, *p1, *p2, "pentago_mc.csv", "Pentago", "pentago_mc.png")
+	go runExperiment(nineWrap, *p1, *p2, "ninemansmorris_mc.csv", "Nine Man's Morris", "ninemansmorris_mc.png")
+	go runExperiment(boxesWrap, *p1, *p2, "boxes_mc.csv", "Boxes", "boxes_mc.png")
+	go runExperiment(checkersWrap, *p1, *p2, "checkers_mc.csv", "Checkers", "checkers_mc.png")
+	go runExperiment(ticWrap, *p1, *p2, "tictactoe_mc.csv", "Tic Tac Toe", "tictactoe_mc.png")
+	go runExperiment(abaloneWrap, *p1, *p2, "abalone_mc.csv", "Abalone", "abalone_mc.png")
+	for i := 0; i < 10; i++ {
+		<-ch
+	}
+	//wins := 0
+	//games := [10]interfaces.Game{
+	//	game.NewTicTacToe(*p1, *p2, 40, 0),
+	//	game.NewReversi(*p1, *p2, 40, 25),
+	//	game.NewPentago(*p1, *p2, 40, 50),
+	//	game.NewNineMensMorris(*p1, *p2, 40, 35),
+	//	game.NewMartianChess(*p1, *p2, 40, 55),
+	//	game.NewMancala(*p1, *p2, 40, 40),
+	//	game.NewConnect4(*p1, *p2, 40, 30),
+	//	game.NewCheckers(*p1, *p2, 40, 30),
+	//	game.NewBoxes(*p1, *p2, 40, 50),
+	//	game.NewAbalone(*p1, *p2, 40, 60),
+	//}
+	//for _, g := range games {
+	//	_ = game.Play(g, true)
+	//}
+	//fmt.Println("Total wins: ", wins)
 }

@@ -36,7 +36,6 @@ func (p AlphabetaPlayer) GetTurn(g game.Game) game.Move {
 		}
 		if beta <= alpha {
 			return move
-			break
 		}
 	}
 	bestScore := MinInt
