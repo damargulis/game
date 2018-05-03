@@ -37,22 +37,6 @@ func (g Reversi) BoardString() string {
 	return s
 }
 
-func (g Reversi) PrintBoard() {
-	fmt.Println("-----------------")
-	fmt.Println("  0 1 2 3 4 5 6 7")
-	for i, row := range g.board {
-		fmt.Print(i)
-		fmt.Print(" ")
-		for _, p := range row {
-			fmt.Print(p)
-			fmt.Print(" ")
-		}
-		fmt.Println()
-	}
-	fmt.Println("  0 1 2 3 4 5 6 7")
-	fmt.Println("-----------------")
-}
-
 func (g Reversi) GetPlayerTurn() game.Player {
 	if g.pTurn {
 		return g.p1
@@ -110,11 +94,6 @@ func (g Reversi) GetPossibleMoves() []game.Move {
 		}
 	}
 	return moves
-}
-
-func (g Reversi) GetTurn(p game.Player) game.Move {
-	m := p.GetTurn(g)
-	return m
 }
 
 func (g Reversi) checkAndFill(i, j, rowDir, colDir int) Reversi {

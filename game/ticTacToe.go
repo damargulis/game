@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"github.com/damargulis/game/interfaces"
 	"github.com/damargulis/game/player"
 )
@@ -149,16 +148,6 @@ func (g TicTacToe) GetPlayerTurn() game.Player {
 	}
 }
 
-func (g TicTacToe) GetTurn(p game.Player) game.Move {
-	m := p.GetTurn(g)
-	move := m.(TicTacToeMove)
-	for !g.isGoodMove(move) {
-		m = p.GetTurn(g)
-		move = m.(TicTacToeMove)
-	}
-	return m
-}
-
 func (g TicTacToe) BoardString() string {
 	s := "---\n"
 	for _, row := range g.board {
@@ -169,15 +158,4 @@ func (g TicTacToe) BoardString() string {
 	}
 	s += "---\n"
 	return s
-}
-
-func (g TicTacToe) PrintBoard() {
-	fmt.Println("---")
-	for _, row := range g.board {
-		for _, p := range row {
-			fmt.Print(p)
-		}
-		fmt.Println()
-	}
-	fmt.Println("---")
 }

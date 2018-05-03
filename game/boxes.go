@@ -62,46 +62,6 @@ func (g Boxes) BoardString() string {
 	return s
 }
 
-func (g Boxes) PrintBoard() {
-	fmt.Println("***********")
-	fmt.Println("  012345678")
-	rowNum := 0
-	for i, row := range g.horizontal {
-		fmt.Print(rowNum)
-		fmt.Print(" ")
-		rowNum++
-		for _, spot := range row {
-			fmt.Print(".")
-			if spot {
-				fmt.Print("-")
-			} else {
-				fmt.Print(" ")
-			}
-		}
-		fmt.Print(".")
-		fmt.Print("\n")
-		if i >= len(g.vertical) {
-			continue
-		}
-		fmt.Print(rowNum)
-		fmt.Print(" ")
-		rowNum++
-		for j, spot := range g.vertical[i] {
-			if spot {
-				fmt.Print("|")
-			} else {
-				fmt.Print(" ")
-			}
-			if i < len(g.owners) && j < len(g.owners[i]) {
-				fmt.Print(g.owners[i][j])
-			}
-		}
-		fmt.Print("\n")
-	}
-	fmt.Println("  012345678")
-	fmt.Println("***********")
-}
-
 func (g Boxes) GetPlayerTurn() game.Player {
 	if g.pTurn {
 		return g.p1
@@ -169,16 +129,6 @@ func (g Boxes) isGoodMove(m BoxesMove) bool {
 		}
 	}
 	return false
-}
-
-func (g Boxes) GetTurn(p game.Player) game.Move {
-	m := p.GetTurn(g)
-	move := m.(BoxesMove)
-	for !g.isGoodMove(move) {
-		m = p.GetTurn(g)
-		move = m.(BoxesMove)
-	}
-	return m
 }
 
 func (g Boxes) MakeMove(move game.Move) game.Game {

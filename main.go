@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/damargulis/game/game"
+	interfaces "github.com/damargulis/game/interfaces"
 	"github.com/damargulis/graph"
 	"math/rand"
 	"os"
@@ -60,11 +61,25 @@ func runExperiment(wrapper func(string, string, int, int) int, p1 string, p2 str
 
 func main() {
 	rand.Seed(time.Now().Unix())
-	p1 := flag.String("p1", "Alphabeta", "Player 1")
+	p1 := flag.String("p1", "Human", "Player 1")
 	p2 := flag.String("p2", "Alphabeta", "Player 2")
 	flag.Parse()
 	//ch := make(chan int)
-
-	g := game.NewReversi(*p1, *p2, 30, 30)
-	_ = game.Play(g, true)
+	wins := 0
+	games := [10]interfaces.Game{
+		game.NewTicTacToe(*p1, *p2, 1000, 0),
+		game.NewReversi(*p1, *p2, 33, 25),
+		game.NewPentago(*p1, *p2, 65, 50),
+		game.NewNineMensMorris(*p1, *p2, 50, 35),
+		game.NewMartianChess(*p1, *p2, 80, 55),
+		game.NewMancala(*p1, *p2, 60, 40),
+		game.NewConnect4(*p1, *p2, 55, 30),
+		game.NewCheckers(*p1, *p2, 45, 30),
+		game.NewBoxes(*p1, *p2, 80, 50),
+		game.NewAbalone(*p1, *p2, 85, 60),
+	}
+	for _, g := range games {
+		_ = game.Play(g, true)
+	}
+	fmt.Println("Total wins: ", wins)
 }

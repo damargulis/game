@@ -102,10 +102,6 @@ func (g Abalone) BoardString() string {
 	return s
 }
 
-func (g Abalone) PrintBoard() {
-	fmt.Println(g.BoardString())
-}
-
 func (g Abalone) GetPlayerTurn() game.Player {
 	if g.pTurn {
 		return g.p1
@@ -267,11 +263,6 @@ func (g Abalone) GetPossibleMoves() []game.Move {
 	return moves
 }
 
-func (g Abalone) GetTurn(p game.Player) game.Move {
-	m := p.GetTurn(g)
-	return m
-}
-
 func (g Abalone) MakeMove(m game.Move) game.Game {
 	g.round++
 	move := m.(AbaloneMove)
@@ -352,7 +343,7 @@ func (g Abalone) MakeMove(m game.Move) game.Game {
 }
 
 func (g Abalone) GameOver() (bool, game.Player) {
-	if g.round > 500 {
+	if g.round > 1000 {
 		return true, player.HumanPlayer{"DRAW"}
 	}
 	if len(g.GetPossibleMoves()) == 0 {

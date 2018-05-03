@@ -60,10 +60,6 @@ func (g MartianChess) BoardString() string {
 	return s
 }
 
-func (g MartianChess) PrintBoard() {
-	fmt.Println(g.BoardString())
-}
-
 func (g MartianChess) GetPlayerTurn() game.Player {
 	if g.pTurn {
 		return g.p1
@@ -200,11 +196,6 @@ func (g MartianChess) GetPossibleMoves() []game.Move {
 		rMoves = append(rMoves, move)
 	}
 	return rMoves
-}
-
-func (g MartianChess) GetTurn(p game.Player) game.Move {
-	m := p.GetTurn(g)
-	return m
 }
 
 func (g MartianChess) MakeMove(m game.Move) game.Game {

@@ -65,10 +65,6 @@ func (g Mancala) BoardString() string {
 	return s
 }
 
-func (g Mancala) PrintBoard() {
-	fmt.Println(g.BoardString())
-}
-
 func (g Mancala) GetPlayerTurn() game.Player {
 	if g.pTurn {
 		return g.p1
@@ -110,10 +106,6 @@ func (g Mancala) GetPossibleMoves() []game.Move {
 		}
 	}
 	return moves
-}
-
-func (g Mancala) GetTurn(p game.Player) game.Move {
-	return p.GetTurn(g)
 }
 
 func (g Mancala) MakeMove(m game.Move) game.Game {

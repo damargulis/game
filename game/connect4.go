@@ -36,21 +36,6 @@ func (g Connect4) BoardString() string {
 	return s
 }
 
-func (g Connect4) PrintBoard() {
-	fmt.Println("-----------------")
-	for i, row := range g.board {
-		fmt.Print(i)
-		fmt.Print(" ")
-		for _, p := range row {
-			fmt.Print(p)
-			fmt.Print(" ")
-		}
-		fmt.Println()
-	}
-	fmt.Println("  0 1 2 3 4 5 6 7")
-	fmt.Println("-----------------")
-}
-
 func (g Connect4) GetPlayerTurn() game.Player {
 	if g.pTurn {
 		return g.p1
@@ -73,11 +58,6 @@ func (g Connect4) GetPossibleMoves() []game.Move {
 		}
 	}
 	return moves
-}
-
-func (g Connect4) GetTurn(p game.Player) game.Move {
-	m := p.GetTurn(g)
-	return m
 }
 
 func (g Connect4) MakeMove(m game.Move) game.Game {

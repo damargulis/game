@@ -58,10 +58,6 @@ func (g Pentago) BoardString() string {
 	return s
 }
 
-func (g Pentago) PrintBoard() {
-	fmt.Println(g.BoardString())
-}
-
 func (g Pentago) GetPlayerTurn() game.Player {
 	if g.pTurn {
 		return g.p1
@@ -137,11 +133,6 @@ func (g Pentago) GetPossibleMoves() []game.Move {
 		}
 	}
 	return moves
-}
-
-func (g Pentago) GetTurn(p game.Player) game.Move {
-	m := p.GetTurn(g)
-	return m
 }
 
 func (g Pentago) MakeMove(m game.Move) game.Game {

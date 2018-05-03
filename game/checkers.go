@@ -208,7 +208,8 @@ func (g Checkers) GetPossibleMoves() []game.Move {
 			if (g.pTurn && (spot == "X" || spot == "x")) || (!g.pTurn && spot == "O") {
 				moves = append(moves, g.checkJump(i, j, -1, -1)...)
 				moves = append(moves, g.checkJump(i, j, -1, 1)...)
-			} else if (!g.pTurn && (spot == "O" || spot == "o")) || (g.pTurn && spot == "X") {
+			}
+			if (!g.pTurn && (spot == "O" || spot == "o")) || (g.pTurn && spot == "X") {
 				moves = append(moves, g.checkJump(i, j, 1, -1)...)
 				moves = append(moves, g.checkJump(i, j, 1, 1)...)
 			}
@@ -240,16 +241,6 @@ func (g Checkers) GetPlayerTurn() game.Player {
 	}
 }
 
-func (g Checkers) GetTurn(p game.Player) game.Move {
-	m := p.GetTurn(g)
-	//move := m.(CheckersMove)
-	//for !g.isGoodMove(move) {
-	//	m = p.GetTurn(g)
-	//	move = m.(CheckersMove)
-	//}
-	return m
-}
-
 func (g Checkers) BoardString() string {
 	s := "-----------------\n"
 	s += "  0 1 2 3 4 5 6 7\n"
@@ -264,20 +255,4 @@ func (g Checkers) BoardString() string {
 	s += "  0 1 2 3 4 5 6 7\n"
 	s += "-----------------\n"
 	return s
-}
-
-func (g Checkers) PrintBoard() {
-	fmt.Println("-----------------")
-	fmt.Println("  0 1 2 3 4 5 6 7")
-	for i, row := range g.board {
-		fmt.Print(i)
-		fmt.Print(" ")
-		for _, p := range row {
-			fmt.Print(p)
-			fmt.Print(" ")
-		}
-		fmt.Println()
-	}
-	fmt.Println("  0 1 2 3 4 5 6 7")
-	fmt.Println("-----------------")
 }

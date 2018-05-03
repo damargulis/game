@@ -44,8 +44,8 @@ func Play(g game.Game, print bool) int {
 		if print {
 			fmt.Println(g.BoardString())
 		}
-		move := g.GetTurn(g.GetPlayerTurn())
-		g = g.MakeMove(move)
+		player := g.GetPlayerTurn()
+		g = g.MakeMove(player.GetTurn(g))
 	}
 	if print {
 		fmt.Println(g.BoardString())

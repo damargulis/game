@@ -61,10 +61,6 @@ func (g NineMensMorris) BoardString() string {
 	return s
 }
 
-func (g NineMensMorris) PrintBoard() {
-	fmt.Println(g.BoardString())
-}
-
 func (g NineMensMorris) GetPlayerTurn() game.Player {
 	if g.pTurn {
 		return g.p1
@@ -219,16 +215,6 @@ func (g NineMensMorris) GetPossibleMoves() []game.Move {
 		}
 		return moves
 	}
-}
-
-func (g NineMensMorris) GetTurn(p game.Player) game.Move {
-	m := p.GetTurn(g)
-	//move := m.(CheckersMove)
-	//for !g.isGoodMove(move) {
-	//	m = p.GetTurn(g)
-	//	move = m.(CheckersMove)
-	//}
-	return m
 }
 
 func (g NineMensMorris) MakeMove(m game.Move) game.Game {
