@@ -60,7 +60,7 @@ func runExperiment(wrapper func(string, string, int, int) int, p1 string, p2 str
 
 func main() {
 	rand.Seed(time.Now().Unix())
-	p1 := flag.String("p1", "MCTEST", "Player 1")
+	p1 := flag.String("p1", "Montecarlo", "Player 1")
 	p2 := flag.String("p2", "Montecarlo", "Player 2")
 	flag.Parse()
 
@@ -110,7 +110,7 @@ func main() {
 	go runExperiment(martianWrap, *p1, *p2, "martianchess_mc.csv", "Martian Chess", "martianchess_mc.png")
 	go runExperiment(reversiWrap, *p1, *p2, "reversi_mc.csv", "Reversi", "reversi_mc.png")
 	go runExperiment(pentagoWrap, *p1, *p2, "pentago_mc.csv", "Pentago", "pentago_mc.png")
-	go runExperiment(nineWrap, *p1, *p2, "ninemansmorris_mc.csv", "Nine Man's Morris", "ninemansmorris_mc.png")
+	go runExperiment(nineWrap, *p1, *p2, "ninemensmorris_mc.csv", "Nine Men's Morris", "ninemensmorris_mc.png")
 	go runExperiment(boxesWrap, *p1, *p2, "boxes_mc.csv", "Boxes", "boxes_mc.png")
 	go runExperiment(checkersWrap, *p1, *p2, "checkers_mc.csv", "Checkers", "checkers_mc.png")
 	go runExperiment(ticWrap, *p1, *p2, "tictactoe_mc.csv", "Tic Tac Toe", "tictactoe_mc.png")
