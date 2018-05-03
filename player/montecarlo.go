@@ -24,7 +24,9 @@ func (p MonteCarloPlayer) GetTurn(g game.Game) game.Move {
 		newG := g.MakeMove(moves[move])
 		winner := p.runSimulation(newG)
 		if winner == p {
-			wins[move]++
+			wins[move] += 2
+		} else if winner.GetName() == "DRAW" {
+			wins[move] += 1
 		}
 	}
 	bestScore := 0.0

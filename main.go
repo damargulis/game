@@ -105,7 +105,7 @@ func main() {
 		g := game.NewAbalone(p1, p2, depth1, depth2)
 		return game.Play(g, false)
 	}
-	go runExperiment(connectWrap, *p1, *p2, "connect4_mc.csv", "Connect 4", "connect_mc.png")
+	go runExperiment(connectWrap, *p1, *p2, "connect4_mc.csv", "Connect 4", "connect4_mc.png")
 	go runExperiment(mancalaWrap, *p1, *p2, "mancala_mc.csv", "Mancala", "mancala_mc.png")
 	go runExperiment(martianWrap, *p1, *p2, "martianchess_mc.csv", "Martian Chess", "martianchess_mc.png")
 	go runExperiment(reversiWrap, *p1, *p2, "reversi_mc.csv", "Reversi", "reversi_mc.png")
