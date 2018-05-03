@@ -1,13 +1,9 @@
 package game
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/damargulis/game/interfaces"
 	"github.com/damargulis/game/player"
-	"os"
-	"strconv"
-	"strings"
 )
 
 type MartianChess struct {
@@ -22,6 +18,10 @@ type MartianChess struct {
 
 type MartianChessMove struct {
 	startRow, startCol, endRow, endCol int
+}
+
+func (g MartianChess) GetBoardDimensions() (int, int) {
+	return len(g.board), len(g.board[0])
 }
 
 func NewMartianChess(p1 string, p2 string, depth1 int, depth2 int) *MartianChess {
@@ -60,10 +60,6 @@ func (g MartianChess) BoardString() string {
 	return s
 }
 
-func (g MartianChess) PrintBoard() {
-	fmt.Println(g.BoardString())
-}
-
 func (g MartianChess) GetPlayerTurn() game.Player {
 	if g.pTurn {
 		return g.p1
@@ -73,20 +69,10 @@ func (g MartianChess) GetPlayerTurn() game.Player {
 }
 
 func (g MartianChess) GetHumanInput() game.Move {
-	fmt.Println("Peice to move: ")
-	reader := bufio.NewReader(os.Stdin)
-	text, _ := reader.ReadString('\n')
-	spot1 := strings.Split(strings.TrimSpace(text), ",")
-	row1, col1 := spot1[0], spot1[1]
-	row1I, _ := strconv.Atoi(row1)
-	col1I, _ := strconv.Atoi(col1)
+	spot1 := readInts("Peice to move: ")
+	spot2 := readInts("Move to: ")
 	fmt.Println("Move to: ")
-	text2, _ := reader.ReadString('\n')
-	spot2 := strings.Split(strings.TrimSpace(text2), ",")
-	row2, col2 := spot2[0], spot2[1]
-	row2I, _ := strconv.Atoi(row2)
-	col2I, _ := strconv.Atoi(col2)
-	return MartianChessMove{startRow: row1I, startCol: col1I, endRow: row2I, endCol: col2I}
+	return MartianChessMove{startRow: spot1[0], startCol: spot2[1], endRow: spot2[0], endCol: spot2[1]}
 }
 
 func in(arr []int, check int) bool {
@@ -100,7 +86,7 @@ func in(arr []int, check int) bool {
 
 func (g MartianChess) getDroneMoves(i, j, rowDir, colDir int, rows []int) []MartianChessMove {
 	var moves []MartianChessMove
-	if i+rowDir >= 0 && i+rowDir < len(g.board) && j+colDir >= 0 && j+colDir < len(g.board[i+rowDir]) {
+	if isInside(g, i+rowDir, j+colDir) {
 		if g.board[i+rowDir][j+colDir] == "." || !in(rows, i+rowDir) {
 			moves = append(moves, MartianChessMove{
 				startRow: i,
@@ -112,7 +98,7 @@ func (g MartianChess) getDroneMoves(i, j, rowDir, colDir int, rows []int) []Mart
 		if g.board[i+rowDir][j+colDir] == "." {
 			endRow := i + rowDir*2
 			endCol := j + colDir*2
-			if endRow >= 0 && endRow < len(g.board) && endCol >= 0 && endCol < len(g.board[endRow]) {
+			if isInside(g, endRow, endCol) {
 				if g.board[endRow][endCol] == "." || !in(rows, endRow) {
 					moves = append(moves, MartianChessMove{
 						startRow: i,
@@ -131,7 +117,7 @@ func (g MartianChess) getPawnMoves(i, j, rowDir, colDir int, rows []int) []Marti
 	var moves []MartianChessMove
 	endRow := i + rowDir
 	endCol := j + colDir
-	if endRow >= 0 && endRow < len(g.board) && endCol >= 0 && endCol < len(g.board[endRow]) {
+	if isInside(g, endRow, endCol) {
 		if g.board[endRow][endCol] == "." || !in(rows, endRow) {
 			moves = append(moves, MartianChessMove{
 				startRow: i,
@@ -148,7 +134,7 @@ func (g MartianChess) getQueenMoves(i, j, rowDir, colDir int, rows []int) []Mart
 	var moves []MartianChessMove
 	endRow := i + rowDir
 	endCol := j + colDir
-	for endRow >= 0 && endRow < len(g.board) && endCol >= 0 && endCol < len(g.board[endRow]) && g.board[endRow][endCol] == "." {
+	for isInside(g, endRow, endCol) && g.board[endRow][endCol] == "." {
 		moves = append(moves, MartianChessMove{
 			startRow: i,
 			startCol: j,
@@ -158,7 +144,7 @@ func (g MartianChess) getQueenMoves(i, j, rowDir, colDir int, rows []int) []Mart
 		endRow += rowDir
 		endCol += colDir
 	}
-	if endRow >= 0 && endRow < len(g.board) && endCol >= 0 && endCol < len(g.board[endRow]) && !in(rows, endRow) {
+	if isInside(g, endRow, endCol) && !in(rows, endRow) {
 		moves = append(moves, MartianChessMove{
 			startRow: i,
 			startCol: j,
@@ -210,11 +196,6 @@ func (g MartianChess) GetPossibleMoves() []game.Move {
 		rMoves = append(rMoves, move)
 	}
 	return rMoves
-}
-
-func (g MartianChess) GetTurn(p game.Player) game.Move {
-	m := p.GetTurn(g)
-	return m
 }
 
 func (g MartianChess) MakeMove(m game.Move) game.Game {

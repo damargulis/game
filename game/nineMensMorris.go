@@ -1,13 +1,9 @@
 package game
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/damargulis/game/interfaces"
 	"github.com/damargulis/game/player"
-	"os"
-	"strconv"
-	"strings"
 )
 
 type NineMensMorris struct {
@@ -21,6 +17,10 @@ type NineMensMorris struct {
 
 type NineMensMorrisMove struct {
 	row1, col1, row2, col2 int
+}
+
+func (g NineMensMorris) GetBoardDimensions() (int, int) {
+	return len(g.board), len(g.board[0])
 }
 
 func NewNineMensMorris(p1 string, p2 string, depth1 int, depth2 int) *NineMensMorris {
@@ -61,10 +61,6 @@ func (g NineMensMorris) BoardString() string {
 	return s
 }
 
-func (g NineMensMorris) PrintBoard() {
-	fmt.Println(g.BoardString())
-}
-
 func (g NineMensMorris) GetPlayerTurn() game.Player {
 	if g.pTurn {
 		return g.p1
@@ -86,33 +82,23 @@ func (g NineMensMorris) GetHumanInput() game.Move {
 	var move game.Move
 	var possibleMoves = g.GetPossibleMoves()
 	for !isIn(possibleMoves, move) {
+		var spot []int
 		if g.justMilled {
-			fmt.Println("Peice to take: ")
+			spot = readInts("Peice to take: ")
 		} else if g.stage1 {
-			fmt.Println("Spot to place: ")
+			spot = readInts("Spot to place: ")
 		} else {
-			fmt.Println("Peice to move: ")
+			spot = readInts("Peice to move: ")
 		}
-		reader := bufio.NewReader(os.Stdin)
-		text, _ := reader.ReadString('\n')
-		spot1 := strings.Split(strings.TrimSpace(text), ",")
-		row1, col1 := spot1[0], spot1[1]
-		row1I, _ := strconv.Atoi(row1)
-		col1I, _ := strconv.Atoi(col1)
 		if g.stage1 || g.justMilled {
-			move = NineMensMorrisMove{row1: row1I, col1: col1I}
+			move = NineMensMorrisMove{row1: spot[0], col1: spot[1]}
 		} else {
-			fmt.Println("Move to: ")
-			text1, _ := reader.ReadString('\n')
-			spot2 := strings.Split(strings.TrimSpace(text1), ",")
-			row2, col2 := spot2[0], spot2[1]
-			row2I, _ := strconv.Atoi(row2)
-			col2I, _ := strconv.Atoi(col2)
+			spot2 := readInts("Move to: ")
 			move = NineMensMorrisMove{
-				row1: row1I,
-				col1: col1I,
-				row2: row2I,
-				col2: col2I,
+				row1: spot[0],
+				col1: spot[1],
+				row2: spot2[0],
+				col2: spot2[1],
 			}
 		}
 	}
@@ -176,10 +162,10 @@ func (g NineMensMorris) GetPossibleMoves() []game.Move {
 				if spot == owns {
 					checkRow := i
 					checkCol := j + 1
-					for checkCol < len(g.board[0]) && g.board[checkRow][checkCol] == "-" {
+					for isInside(g, checkRow, checkCol) && g.board[checkRow][checkCol] == "-" {
 						checkCol++
 					}
-					if checkCol < len(g.board[0]) && g.board[checkRow][checkCol] == "." {
+					if isInside(g, checkRow, checkCol) && g.board[checkRow][checkCol] == "." {
 						moves = append(moves, NineMensMorrisMove{
 							row1: i,
 							col1: j,
@@ -188,10 +174,10 @@ func (g NineMensMorris) GetPossibleMoves() []game.Move {
 						})
 					}
 					checkCol = j - 1
-					for checkCol >= 0 && g.board[checkRow][checkCol] == "-" {
+					for isInside(g, checkRow, checkCol) && g.board[checkRow][checkCol] == "-" {
 						checkCol--
 					}
-					if checkCol >= 0 && g.board[checkRow][checkCol] == "." {
+					if isInside(g, checkRow, checkCol) && g.board[checkRow][checkCol] == "." {
 						moves = append(moves, NineMensMorrisMove{
 							row1: i,
 							col1: j,
@@ -201,10 +187,10 @@ func (g NineMensMorris) GetPossibleMoves() []game.Move {
 					}
 					checkCol = j
 					checkRow = i + 1
-					for checkRow < len(g.board) && g.board[checkRow][checkCol] == "|" {
+					for isInside(g, checkRow, checkCol) && g.board[checkRow][checkCol] == "|" {
 						checkRow++
 					}
-					if checkRow < len(g.board) && g.board[checkRow][checkCol] == "." {
+					if isInside(g, checkRow, checkCol) && g.board[checkRow][checkCol] == "." {
 						moves = append(moves, NineMensMorrisMove{
 							row1: i,
 							col1: j,
@@ -213,10 +199,10 @@ func (g NineMensMorris) GetPossibleMoves() []game.Move {
 						})
 					}
 					checkRow = i - 1
-					for checkRow >= 0 && g.board[checkRow][checkCol] == "|" {
+					for isInside(g, checkRow, checkCol) && g.board[checkRow][checkCol] == "|" {
 						checkRow--
 					}
-					if checkRow >= 0 && g.board[checkRow][checkCol] == "." {
+					if isInside(g, checkRow, checkCol) && g.board[checkRow][checkCol] == "." {
 						moves = append(moves, NineMensMorrisMove{
 							row1: i,
 							col1: j,
@@ -229,16 +215,6 @@ func (g NineMensMorris) GetPossibleMoves() []game.Move {
 		}
 		return moves
 	}
-}
-
-func (g NineMensMorris) GetTurn(p game.Player) game.Move {
-	m := p.GetTurn(g)
-	//move := m.(CheckersMove)
-	//for !g.isGoodMove(move) {
-	//	m = p.GetTurn(g)
-	//	move = m.(CheckersMove)
-	//}
-	return m
 }
 
 func (g NineMensMorris) MakeMove(m game.Move) game.Game {
@@ -288,14 +264,14 @@ func (g NineMensMorris) isInMill(row, col int) bool {
 	vertical := 0
 	checkRow := row
 	checkCol := col + 1
-	for checkCol < len(g.board[0]) && (g.board[checkRow][checkCol] == "-" || g.board[checkRow][checkCol] == own) {
+	for isInside(g, checkRow, checkCol) && (g.board[checkRow][checkCol] == "-" || g.board[checkRow][checkCol] == own) {
 		if g.board[checkRow][checkCol] == own {
 			horizontal += 1
 		}
 		checkCol++
 	}
 	checkCol = col - 1
-	for checkCol >= 0 && (g.board[checkRow][checkCol] == "-" || g.board[checkRow][checkCol] == own) {
+	for isInside(g, checkRow, checkCol) && (g.board[checkRow][checkCol] == "-" || g.board[checkRow][checkCol] == own) {
 		if g.board[checkRow][checkCol] == own {
 			horizontal += 1
 		}
@@ -303,14 +279,14 @@ func (g NineMensMorris) isInMill(row, col int) bool {
 	}
 	checkCol = col
 	checkRow = row + 1
-	for checkRow < len(g.board) && (g.board[checkRow][checkCol] == "|" || g.board[checkRow][checkCol] == own) {
+	for isInside(g, checkRow, checkCol) && (g.board[checkRow][checkCol] == "|" || g.board[checkRow][checkCol] == own) {
 		if g.board[checkRow][checkCol] == own {
 			vertical += 1
 		}
 		checkRow++
 	}
 	checkRow = row - 1
-	for checkRow >= 0 && (g.board[checkRow][checkCol] == "|" || g.board[checkRow][checkCol] == own) {
+	for isInside(g, checkRow, checkCol) && (g.board[checkRow][checkCol] == "|" || g.board[checkRow][checkCol] == own) {
 		if g.board[checkRow][checkCol] == own {
 			vertical += 1
 		}

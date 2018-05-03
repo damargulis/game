@@ -1,13 +1,9 @@
 package game
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/damargulis/game/interfaces"
 	"github.com/damargulis/game/player"
-	"os"
-	"strconv"
-	"strings"
 )
 
 type Boxes struct {
@@ -22,6 +18,10 @@ type Boxes struct {
 type BoxesMove struct {
 	horizontal bool
 	row, col   int
+}
+
+func (g Boxes) GetBoardDimensions() (int, int) {
+	return len(g.owners), len(g.owners)
 }
 
 func (g Boxes) BoardString() string {
@@ -62,46 +62,6 @@ func (g Boxes) BoardString() string {
 	return s
 }
 
-func (g Boxes) PrintBoard() {
-	fmt.Println("***********")
-	fmt.Println("  012345678")
-	rowNum := 0
-	for i, row := range g.horizontal {
-		fmt.Print(rowNum)
-		fmt.Print(" ")
-		rowNum++
-		for _, spot := range row {
-			fmt.Print(".")
-			if spot {
-				fmt.Print("-")
-			} else {
-				fmt.Print(" ")
-			}
-		}
-		fmt.Print(".")
-		fmt.Print("\n")
-		if i >= len(g.vertical) {
-			continue
-		}
-		fmt.Print(rowNum)
-		fmt.Print(" ")
-		rowNum++
-		for j, spot := range g.vertical[i] {
-			if spot {
-				fmt.Print("|")
-			} else {
-				fmt.Print(" ")
-			}
-			if i < len(g.owners) && j < len(g.owners[i]) {
-				fmt.Print(g.owners[i][j])
-			}
-		}
-		fmt.Print("\n")
-	}
-	fmt.Println("  012345678")
-	fmt.Println("***********")
-}
-
 func (g Boxes) GetPlayerTurn() game.Player {
 	if g.pTurn {
 		return g.p1
@@ -113,12 +73,8 @@ func (g Boxes) GetPlayerTurn() game.Player {
 func (g Boxes) GetHumanInput() game.Move {
 	colI, rowI := 0, 0
 	for (colI+rowI)%2 == 0 {
-		reader := bufio.NewReader(os.Stdin)
-		text, _ := reader.ReadString('\n')
-		move := strings.Split(strings.TrimSpace(text), ",")
-		row, col := move[0], move[1]
-		rowI, _ = strconv.Atoi(row)
-		colI, _ = strconv.Atoi(col)
+		spot := readInts("Place a line at: ")
+		rowI, colI = spot[0], spot[1]
 	}
 	var horizontal bool
 	if rowI%2 == 0 {
@@ -173,16 +129,6 @@ func (g Boxes) isGoodMove(m BoxesMove) bool {
 		}
 	}
 	return false
-}
-
-func (g Boxes) GetTurn(p game.Player) game.Move {
-	m := p.GetTurn(g)
-	move := m.(BoxesMove)
-	for !g.isGoodMove(move) {
-		m = p.GetTurn(g)
-		move = m.(BoxesMove)
-	}
-	return m
 }
 
 func (g Boxes) MakeMove(move game.Move) game.Game {

@@ -1,13 +1,8 @@
 package game
 
 import (
-	"bufio"
-	"fmt"
 	"github.com/damargulis/game/interfaces"
 	"github.com/damargulis/game/player"
-	"os"
-	"strconv"
-	"strings"
 )
 
 type TicTacToe struct {
@@ -21,14 +16,13 @@ type TicTacToeMove struct {
 	row, col int
 }
 
+func (g TicTacToe) GetBoardDimensions() (int, int) {
+	return len(g.board), len(g.board[0])
+}
+
 func (g TicTacToe) GetHumanInput() game.Move {
-	reader := bufio.NewReader(os.Stdin)
-	text, _ := reader.ReadString('\n')
-	move := strings.Split(strings.TrimSpace(text), ",")
-	row, col := move[0], move[1]
-	rowI, _ := strconv.Atoi(row)
-	colI, _ := strconv.Atoi(col)
-	return TicTacToeMove{row: rowI, col: colI}
+	spot := readInts("Spot to place: ")
+	return TicTacToeMove{row: spot[0], col: spot[1]}
 }
 
 func (g TicTacToe) GameOver() (bool, game.Player) {
@@ -127,13 +121,7 @@ func (g TicTacToe) MakeMove(m game.Move) game.Game {
 func (g TicTacToe) isGoodMove(m TicTacToeMove) bool {
 	row := m.row
 	col := m.col
-	if row < 0 || col < 0 {
-		return false
-	} else if row > 2 || col > 2 {
-		return false
-	} else {
-		return g.board[row][col] == "."
-	}
+	return isInside(g, row, col) && g.board[row][col] == "."
 }
 
 func (g TicTacToe) GetPossibleMoves() []game.Move {
@@ -160,16 +148,6 @@ func (g TicTacToe) GetPlayerTurn() game.Player {
 	}
 }
 
-func (g TicTacToe) GetTurn(p game.Player) game.Move {
-	m := p.GetTurn(g)
-	move := m.(TicTacToeMove)
-	for !g.isGoodMove(move) {
-		m = p.GetTurn(g)
-		move = m.(TicTacToeMove)
-	}
-	return m
-}
-
 func (g TicTacToe) BoardString() string {
 	s := "---\n"
 	for _, row := range g.board {
@@ -180,15 +158,4 @@ func (g TicTacToe) BoardString() string {
 	}
 	s += "---\n"
 	return s
-}
-
-func (g TicTacToe) PrintBoard() {
-	fmt.Println("---")
-	for _, row := range g.board {
-		for _, p := range row {
-			fmt.Print(p)
-		}
-		fmt.Println()
-	}
-	fmt.Println("---")
 }
