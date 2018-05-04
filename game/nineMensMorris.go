@@ -296,9 +296,6 @@ func (g NineMensMorris) isInMill(row, col int) bool {
 }
 
 func (g NineMensMorris) GameOver() (bool, game.Player) {
-	if g.round > 500 {
-		return true, player.HumanPlayer{"DRAW"}
-	}
 	if g.stage1 {
 		return false, player.ComputerPlayer{}
 	}
@@ -318,6 +315,15 @@ func (g NineMensMorris) GameOver() (bool, game.Player) {
 			} else if spot == "O" {
 				p2++
 			}
+		}
+	}
+	if g.round > 500 {
+		if p1 > p2 {
+			return true, g.p1
+		} else if p2 > p1 {
+			return true, g.p2
+		} else {
+			return true, player.HumanPlayer{"DRAW"}
 		}
 	}
 	if p1 < 3 {
