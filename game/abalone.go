@@ -343,9 +343,6 @@ func (g Abalone) MakeMove(m game.Move) game.Game {
 }
 
 func (g Abalone) GameOver() (bool, game.Player) {
-	if g.round > 1000 {
-		return true, player.HumanPlayer{"DRAW"}
-	}
 	if len(g.GetPossibleMoves()) == 0 {
 		return true, player.HumanPlayer{"DRAW"}
 	}
@@ -358,6 +355,15 @@ func (g Abalone) GameOver() (bool, game.Player) {
 			} else if spot == "O" {
 				p2left++
 			}
+		}
+	}
+	if g.round > 1000 {
+		if p1left > p2left {
+			return true, g.p1
+		} else if p2left > p1left {
+			return true, g.p2
+		} else {
+			return true, player.HumanPlayer{"DRAW"}
 		}
 	}
 	if p1left <= 8 {

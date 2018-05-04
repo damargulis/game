@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/damargulis/game/interfaces"
 	"github.com/damargulis/game/player"
+	"math"
 )
 
 type MartianChess struct {
@@ -233,22 +234,32 @@ func (g MartianChess) MakeMove(m game.Move) game.Game {
 
 func (g MartianChess) GameOver() (bool, game.Player) {
 	if g.round > 500 {
-		return true, player.HumanPlayer{"DRAW"}
+		if g.p1points == g.p2points {
+			return true, player.HumanPlayer{"DRAW"}
+		} else if g.p1points > g.p2points {
+			return true, g.p1
+		} else {
+			return true, g.p2
+		}
 	}
 	rows1 := []int{0, 1, 2, 3}
 	rows2 := []int{4, 5, 6, 7}
 	p1Alive := false
 	p2Alive := false
+	pointsLeft := 0
 	for _, i := range rows1 {
 		row := g.board[i]
 		for _, spot := range row {
 			if spot != "." {
 				p1Alive = true
-				break
+				if spot == "Q" {
+					pointsLeft += 3
+				} else if spot == "D" {
+					pointsLeft += 2
+				} else if spot == "P" {
+					pointsLeft++
+				}
 			}
-		}
-		if p1Alive {
-			break
 		}
 	}
 	for _, i := range rows2 {
@@ -256,14 +267,26 @@ func (g MartianChess) GameOver() (bool, game.Player) {
 		for _, spot := range row {
 			if spot != "." {
 				p2Alive = true
-				break
+				if spot == "Q" {
+					pointsLeft += 3
+				} else if spot == "D" {
+					pointsLeft += 2
+				} else if spot == "P" {
+					pointsLeft++
+				}
 			}
 		}
-		if p2Alive {
-			break
-		}
 	}
-	if p1Alive && p2Alive {
+	difference := int(math.Abs(float64(g.p1points - g.p2points)))
+	if difference > pointsLeft {
+		if g.p1points == g.p2points {
+			return true, player.HumanPlayer{"DRAW"}
+		} else if g.p1points > g.p2points {
+			return true, g.p1
+		} else {
+			return true, g.p2
+		}
+	} else if p1Alive && p2Alive {
 		return false, player.ComputerPlayer{}
 	} else {
 		if g.p1points == g.p2points {
