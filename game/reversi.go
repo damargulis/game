@@ -11,6 +11,7 @@ type Reversi struct {
 	p1    game.Player
 	p2    game.Player
 	pTurn bool
+	round int
 }
 
 type ReversiMove struct {
@@ -33,7 +34,7 @@ func (g Reversi) BoardString() string {
 		s += "\n"
 	}
 	s += "  0 1 2 3 4 5 6 7\n"
-	s += "-----------------\n"
+	s += "-----------------"
 	return s
 }
 
@@ -120,6 +121,7 @@ func (g Reversi) checkAndFill(i, j, rowDir, colDir int) Reversi {
 }
 
 func (g Reversi) MakeMove(m game.Move) game.Game {
+	g.round++
 	move := m.(ReversiMove)
 	var match string
 	if g.pTurn {
@@ -180,6 +182,7 @@ func (g Reversi) CurrentScore(p game.Player) int {
 
 func NewReversi(p1 string, p2 string, depth1 int, depth2 int) *Reversi {
 	r := new(Reversi)
+	r.round = 0
 	r.p1 = getPlayer(p1, "Player 1", depth1)
 	r.p2 = getPlayer(p2, "Player 2", depth2)
 	r.pTurn = true
@@ -194,4 +197,8 @@ func NewReversi(p1 string, p2 string, depth1 int, depth2 int) *Reversi {
 		{".", ".", ".", ".", ".", ".", ".", "."},
 	}
 	return r
+}
+
+func (g Reversi) GetRound() int {
+	return g.round
 }

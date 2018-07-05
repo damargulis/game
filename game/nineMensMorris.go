@@ -46,7 +46,7 @@ func NewNineMensMorris(p1 string, p2 string, depth1 int, depth2 int) *NineMensMo
 }
 
 func (g NineMensMorris) BoardString() string {
-	s := "--------------\n"
+	s := "---------------\n"
 	s += "  0 1 2 3 4 5 6\n"
 	for i, row := range g.board {
 		s += fmt.Sprintf("%v ", i)
@@ -57,7 +57,7 @@ func (g NineMensMorris) BoardString() string {
 		s += "\n"
 	}
 	s += "  0 1 2 3 4 5 6\n"
-	s += "--------------\n"
+	s += "---------------"
 	return s
 }
 
@@ -351,4 +351,8 @@ func (g NineMensMorris) CurrentScore(p game.Player) int {
 	} else {
 		return -1 * score
 	}
+}
+
+func (g NineMensMorris) GetRound() int {
+	return g.round
 }

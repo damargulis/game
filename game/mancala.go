@@ -13,6 +13,7 @@ type Mancala struct {
 	p1Capture int
 	p2Capture int
 	pTurn     bool
+	round     int
 }
 
 type MancalaMove struct {
@@ -25,6 +26,7 @@ func (g Mancala) GetBoardDimensions() (int, int) {
 
 func NewMancala(p1 string, p2 string, depth1 int, depth2 int) *Mancala {
 	g := new(Mancala)
+	g.round = 0
 	g.p1 = getPlayer(p1, "Player 1", depth1)
 	g.p2 = getPlayer(p2, "Player 2", depth2)
 	g.pTurn = true
@@ -61,7 +63,7 @@ func (g Mancala) BoardString() string {
 	}
 	s += "\n"
 	s += "   0  1  2  3  4  5\n"
-	s += "-------------------\n"
+	s += "-------------------"
 	return s
 }
 
@@ -109,6 +111,7 @@ func (g Mancala) GetPossibleMoves() []game.Move {
 }
 
 func (g Mancala) MakeMove(m game.Move) game.Game {
+	g.round++
 	move := m.(MancalaMove)
 	amtInHand := g.board[move.row][move.col]
 	g.board[move.row][move.col] = 0
@@ -204,4 +207,8 @@ func (g Mancala) CurrentScore(p game.Player) int {
 	} else {
 		return g.p2Capture - g.p1Capture
 	}
+}
+
+func (g Mancala) GetRound() int {
+	return g.round
 }

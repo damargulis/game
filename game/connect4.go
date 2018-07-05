@@ -11,6 +11,7 @@ type Connect4 struct {
 	p1    game.Player
 	p2    game.Player
 	pTurn bool
+	round int
 }
 
 type Connect4Move struct {
@@ -32,7 +33,7 @@ func (g Connect4) BoardString() string {
 		s += "\n"
 	}
 	s += "  0 1 2 3 4 5 6 7\n"
-	s += "-----------------\n"
+	s += "-----------------"
 	return s
 }
 
@@ -61,6 +62,7 @@ func (g Connect4) GetPossibleMoves() []game.Move {
 }
 
 func (g Connect4) MakeMove(m game.Move) game.Game {
+	g.round++
 	move := m.(Connect4Move)
 	col := move.col
 	i := 0
@@ -77,7 +79,7 @@ func (g Connect4) MakeMove(m game.Move) game.Game {
 }
 
 func (g Connect4) checkMatch(i, j, rowDir, colDir int) bool {
-	return isInside(g, i+rowDir*3, j+colDir+3) &&
+	return isInside(g, i+rowDir*3, j+colDir*3) &&
 		g.board[i][j] == g.board[i+rowDir][j+colDir] &&
 		g.board[i][j] == g.board[i+rowDir*2][j+colDir*2] &&
 		g.board[i][j] == g.board[i+rowDir*3][j+colDir*3]
@@ -148,4 +150,8 @@ func NewConnect4(p1 string, p2 string, depth1 int, depth2 int) *Connect4 {
 		{".", ".", ".", ".", ".", ".", ".", "."},
 	}
 	return c
+}
+
+func (g Connect4) GetRound() int {
+	return g.round
 }

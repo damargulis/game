@@ -15,6 +15,7 @@ type Pentago struct {
 	p2     game.Player
 	pTurn  bool
 	stage1 bool
+	round  int
 }
 
 type PentagoMove struct {
@@ -28,6 +29,7 @@ func (g Pentago) GetBoardDimensions() (int, int) {
 
 func NewPentago(p1 string, p2 string, depth1 int, depth2 int) *Pentago {
 	g := new(Pentago)
+	g.round = 0
 	g.p1 = getPlayer(p1, "Player 1", depth1)
 	g.p2 = getPlayer(p2, "Player 2", depth2)
 	g.pTurn = true
@@ -54,7 +56,7 @@ func (g Pentago) BoardString() string {
 		s += "\n"
 	}
 	s += "  0 1 2 3 4 5 \n"
-	s += "--------------\n"
+	s += "--------------"
 	return s
 }
 
@@ -136,6 +138,7 @@ func (g Pentago) GetPossibleMoves() []game.Move {
 }
 
 func (g Pentago) MakeMove(m game.Move) game.Game {
+	g.round++
 	move := m.(PentagoMove)
 	if g.stage1 {
 		if g.pTurn {
@@ -241,4 +244,8 @@ func (g Pentago) GameOver() (bool, game.Player) {
 
 func (g Pentago) CurrentScore(p game.Player) int {
 	return 0
+}
+
+func (g Pentago) GetRound() int {
+	return g.round
 }

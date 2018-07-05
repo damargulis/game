@@ -10,6 +10,7 @@ type TicTacToe struct {
 	p1    game.Player
 	p2    game.Player
 	pTurn bool
+	round int
 }
 
 type TicTacToeMove struct {
@@ -94,6 +95,7 @@ func (g TicTacToe) GameOver() (bool, game.Player) {
 
 func NewTicTacToe(p1 string, p2 string, depth1 int, depth2 int) *TicTacToe {
 	g := new(TicTacToe)
+	g.round = 0
 	g.p1 = getPlayer(p1, "Player 1", depth1)
 	g.p2 = getPlayer(p2, "Player 2", depth2)
 	g.pTurn = true
@@ -106,6 +108,7 @@ func NewTicTacToe(p1 string, p2 string, depth1 int, depth2 int) *TicTacToe {
 }
 
 func (g TicTacToe) MakeMove(m game.Move) game.Game {
+	g.round++
 	move := m.(TicTacToeMove)
 	row := move.row
 	col := move.col
@@ -156,6 +159,10 @@ func (g TicTacToe) BoardString() string {
 		}
 		s += "\n"
 	}
-	s += "---\n"
+	s += "---"
 	return s
+}
+
+func (g TicTacToe) GetRound() int {
+	return g.round
 }

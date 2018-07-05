@@ -17,4 +17,5 @@ type Game interface {
 	GameOver() (bool, Player)
 	CurrentScore(Player) int
 	GetBoardDimensions() (int, int)
+	GetRound() int
 }

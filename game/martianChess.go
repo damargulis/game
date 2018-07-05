@@ -57,7 +57,7 @@ func (g MartianChess) BoardString() string {
 	}
 	s += "  0 1 2 3\n"
 	s += fmt.Sprintf("P1: %v P2: %v\n", g.p1points, g.p2points)
-	s += "---------\n"
+	s += "---------"
 	return s
 }
 
@@ -305,4 +305,8 @@ func (g MartianChess) CurrentScore(p game.Player) int {
 	} else {
 		return g.p2points - g.p1points
 	}
+}
+
+func (g MartianChess) GetRound() int {
+	return g.round
 }

@@ -253,6 +253,10 @@ func (g Checkers) BoardString() string {
 		s += "\n"
 	}
 	s += "  0 1 2 3 4 5 6 7\n"
-	s += "-----------------\n"
+	s += "-----------------"
 	return s
+}
+
+func (g Checkers) GetRound() int {
+	return g.round
 }

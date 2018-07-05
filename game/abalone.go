@@ -98,7 +98,7 @@ func (g Abalone) BoardString() string {
 	}
 
 	s += "       0 1 2 3 4\n"
-	s += "--------------------\n"
+	s += "--------------------"
 	return s
 }
 
@@ -357,7 +357,7 @@ func (g Abalone) GameOver() (bool, game.Player) {
 			}
 		}
 	}
-	if g.round > 1000 {
+	if g.round > 500 {
 		if p1left > p2left {
 			return true, g.p1
 		} else if p2left > p1left {
@@ -438,4 +438,8 @@ func (g Abalone) CurrentScore(p game.Player) int {
 		}
 	}
 	return score
+}
+
+func (g Abalone) GetRound() int {
+	return g.round
 }

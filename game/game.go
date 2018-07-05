@@ -18,8 +18,14 @@ func getPlayer(playerType string, name string, depth int) game.Player {
 		p = player.MinimaxPlayer{name, depth}
 	case "Alphabeta":
 		p = player.AlphabetaPlayer{name, depth}
+	case "AlphabetaTime":
+		p = player.AlphabetaTimePlayer{name, depth}
 	case "Montecarlo":
 		p = player.MonteCarloPlayer{name, depth}
+	case "MontecarloTime":
+		p = player.MonteCarloTimePlayer{name, depth}
+	case "ComboTime":
+		p = player.ComboTimePlayer{name, depth}
 	default:
 		fmt.Println("Player " + playerType + " not recognized")
 		os.Exit(1)

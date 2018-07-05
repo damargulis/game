@@ -16,6 +16,9 @@ func (p MonteCarloPlayer) GetName() string {
 
 func (p MonteCarloPlayer) GetTurn(g game.Game) game.Move {
 	moves := g.GetPossibleMoves()
+	if len(moves) == 1 {
+		return moves[0]
+	}
 	wins := make([]int, len(moves))
 	attempts := make([]int, len(moves))
 	for i := 0; i < p.MaxSims; i++ {
@@ -24,13 +27,20 @@ func (p MonteCarloPlayer) GetTurn(g game.Game) game.Move {
 		newG := g.MakeMove(moves[move])
 		winner := p.runSimulation(newG)
 		if winner == p {
-			wins[move] += 2
-		} else if winner.GetName() == "DRAW" {
 			wins[move] += 1
+		} else if winner.GetName() == "DRAW" {
+			wins[move] += 0
+		} else {
+			wins[move] -= 1
 		}
 	}
-	bestScore := 0.0
 	scores := make([]float64, len(moves))
+	bestScore := 0.0
+	if attempts[0] > 0 {
+		bestScore = float64(wins[0]) / float64(attempts[0])
+	} else {
+		bestScore = 0
+	}
 	for i := range moves {
 		if attempts[i] > 0 {
 			scores[i] = float64(wins[i]) / float64(attempts[i])
